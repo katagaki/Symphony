@@ -31,65 +31,18 @@ struct WorkflowsView: View {
                 } else {
                     List {
                         ForEach(manager.workflows) { workflow in
-                            WorkflowRowView(
-                                workflow: workflow,
-                                latestBuild: manager.latestBuildRuns[workflow.id]
-                            )
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                selectedWorkflow = workflow
-                                showStartBuild = true
-                            }
-                            .contextMenu {
-                                if let buildRun = manager.latestBuildRuns[workflow.id] {
-                                    NavigationLink(value: buildRun) {
-                                        Label("View Latest Build", systemImage: "eye")
-                                    }
-                                }
-                                Button {
-                                    selectedWorkflow = workflow
-                                    showStartBuild = true
-                                } label: {
-                                    Label("Start Build", systemImage: "play.fill")
-                                }
-                            }
-                        }
-
-                        if !manager.latestBuildRuns.isEmpty {
-                            Section("Recent Builds") {
-                                ForEach(
-                                    Array(manager.latestBuildRuns.values)
-                                        .sorted(by: {
-                                            ($0.attributes.createdDate ?? "") > ($1.attributes.createdDate ?? "")
-                                        }),
-                                    id: \.id
-                                ) { buildRun in
-                                    NavigationLink(value: buildRun) {
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text("Build #\(buildRun.attributes.number ?? 0)")
-                                                    .font(.headline)
-                                                if let commit = buildRun.attributes.sourceCommit,
-                                                   let message = commit.message {
-                                                    Text(message)
-                                                        .font(.caption)
-                                                        .foregroundStyle(.secondary)
-                                                        .lineLimit(1)
-                                                }
-                                            }
-                                            Spacer()
-                                            BuildStatusBadge(
-                                                progress: buildRun.attributes.executionProgress,
-                                                status: buildRun.attributes.completionStatus
-                                            )
-                                        }
-                                    }
-                                }
-                            }
+                            workflowSection(workflow: workflow, manager: manager)
                         }
                     }
                     .refreshable {
                         await manager.loadWorkflows()
+                    }
+                    .overlay(alignment: .topTrailing) {
+                        if manager.isRefreshing {
+                            ProgressView()
+                                .controlSize(.small)
+                                .padding(8)
+                        }
                     }
                 }
             } else {
@@ -108,6 +61,69 @@ struct WorkflowsView: View {
                 let m = WorkflowsManager(api: api, app: app)
                 manager = m
                 await m.loadWorkflows()
+                m.startAutoRefresh()
+            }
+        }
+        .onDisappear {
+            manager?.stopAutoRefresh()
+        }
+    }
+
+    @ViewBuilder
+    private func workflowSection(workflow: CiWorkflow, manager: WorkflowsManager) -> some View {
+        Section {
+            let builds = manager.buildRunsByWorkflow[workflow.id] ?? []
+            if builds.isEmpty {
+                Text("No builds yet")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(builds) { buildRun in
+                    NavigationLink(value: buildRun) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Build #\(buildRun.attributes.number ?? 0)")
+                                    .font(.headline)
+                                if let commit = buildRun.attributes.sourceCommit,
+                                   let message = commit.message {
+                                    Text(message)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(1)
+                                }
+                            }
+                            Spacer()
+                            BuildStatusBadge(
+                                progress: buildRun.attributes.executionProgress,
+                                status: buildRun.attributes.completionStatus
+                            )
+                        }
+                    }
+                    .swipeActions(edge: .trailing) {
+                        if buildRun.attributes.executionProgress == .pending
+                            || buildRun.attributes.executionProgress == .running {
+                            Button(role: .destructive) {
+                                Task {
+                                    await manager.cancelBuildRun(id: buildRun.id)
+                                }
+                            } label: {
+                                Label("Cancel", systemImage: "xmark.circle")
+                            }
+                        }
+                    }
+                }
+            }
+        } header: {
+            HStack {
+                Text(workflow.attributes.name)
+                Spacer()
+                Button {
+                    selectedWorkflow = workflow
+                    showStartBuild = true
+                } label: {
+                    Label("Start Build", systemImage: "play.fill")
+                        .font(.caption)
+                }
             }
         }
     }

@@ -82,6 +82,10 @@ actor AppStoreConnectAPI {
         return response.data
     }
 
+    func cancelBuildRun(id: String) async throws {
+        try await client.delete(path: "/v1/ciBuildRuns/\(id)")
+    }
+
     // MARK: - Build Actions
 
     func listBuildActions(forBuildRunID buildRunID: String) async throws -> [CiBuildAction] {
