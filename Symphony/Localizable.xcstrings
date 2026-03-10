@@ -1,0 +1,162 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%lld" : {
+
+    },
+    "Actions" : {
+
+    },
+    "API Key Information" : {
+
+    },
+    "Apps" : {
+
+    },
+    "Author" : {
+
+    },
+    "Branch or Tag" : {
+
+    },
+    "Branches" : {
+
+    },
+    "Build #%lld" : {
+
+    },
+    "Build started successfully!" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Commit" : {
+
+    },
+    "Connect" : {
+
+    },
+    "Connect your App Store Connect account to manage Xcode Cloud builds." : {
+
+    },
+    "Connecting..." : {
+
+    },
+    "Created" : {
+
+    },
+    "Done" : {
+
+    },
+    "Failed to Load" : {
+
+    },
+    "Find these values in App Store Connect under Users and Access > Integrations > App Store Connect API." : {
+
+    },
+    "Finished" : {
+
+    },
+    "Import from File" : {
+
+    },
+    "Issuer ID" : {
+
+    },
+    "Key ID" : {
+
+    },
+    "Loading apps..." : {
+
+    },
+    "Loading build details..." : {
+
+    },
+    "Loading git references..." : {
+
+    },
+    "Loading logs..." : {
+
+    },
+    "Loading workflows..." : {
+
+    },
+    "No Apps" : {
+
+    },
+    "No apps found in your App Store Connect account." : {
+
+    },
+    "No builds yet" : {
+
+    },
+    "No log content available for this action." : {
+
+    },
+    "No Logs" : {
+
+    },
+    "No Workflows" : {
+
+    },
+    "No Xcode Cloud workflows found for this app." : {
+
+    },
+    "Paste the contents of your .p8 file or import it directly." : {
+
+    },
+    "Private Key (.p8)" : {
+
+    },
+    "Progress" : {
+
+    },
+    "Recent Builds" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Select a branch or tag..." : {
+
+    },
+    "Select Reference" : {
+
+    },
+    "Setup" : {
+
+    },
+    "Sign Out" : {
+
+    },
+    "Source" : {
+
+    },
+    "Start Build" : {
+
+    },
+    "Started" : {
+
+    },
+    "Starting Build..." : {
+
+    },
+    "Status" : {
+
+    },
+    "Tags" : {
+
+    },
+    "View Latest Build" : {
+
+    },
+    "Welcome to Symphony" : {
+
+    },
+    "Workflow" : {
+
+    }
+  },
+  "version" : "1.0"
+}
