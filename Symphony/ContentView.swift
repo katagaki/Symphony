@@ -8,17 +8,21 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
+    @Environment(AuthenticationManager.self) private var authManager
 
-#Preview {
-    ContentView()
+    var body: some View {
+        if authManager.isAuthenticated {
+            NavigationStack {
+                AppsListView()
+                    .navigationDestination(for: CiApp.self) { app in
+                        WorkflowsView(app: app)
+                    }
+                    .navigationDestination(for: CiBuildRun.self) { buildRun in
+                        BuildRunDetailView(buildRun: buildRun)
+                    }
+            }
+        } else {
+            OnboardingView()
+        }
+    }
 }

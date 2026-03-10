@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct SymphonyApp: App {
+    @State private var authManager = AuthenticationManager()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(authManager)
         }
     }
 }
