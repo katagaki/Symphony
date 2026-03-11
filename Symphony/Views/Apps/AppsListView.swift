@@ -1,8 +1,26 @@
 import SwiftUI
 
+enum AppSortOrder: String, CaseIterable {
+    case name = "Name"
+    case bundleId = "Bundle ID"
+}
+
 struct AppsListView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @State private var appsManager: AppsManager?
+    @State private var sortOrder: AppSortOrder = .name
+    @State private var showMore = false
+    @Namespace private var moreTransition
+
+    private var sortedApps: [CiApp] {
+        guard let apps = appsManager?.apps else { return [] }
+        switch sortOrder {
+        case .name:
+            return apps.sorted { $0.attributes.name.localizedCaseInsensitiveCompare($1.attributes.name) == .orderedAscending }
+        case .bundleId:
+            return apps.sorted { $0.attributes.bundleId.localizedCaseInsensitiveCompare($1.attributes.bundleId) == .orderedAscending }
+        }
+    }
 
     var body: some View {
         Group {
@@ -26,7 +44,7 @@ struct AppsListView: View {
                         description: Text("No apps found in your App Store Connect account.")
                     )
                 } else {
-                    List(manager.apps) { app in
+                    List(sortedApps) { app in
                         NavigationLink(value: app) {
                             AppRowView(app: app)
                         }
@@ -42,16 +60,28 @@ struct AppsListView: View {
         .navigationTitle("Apps")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showMore = true
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+                .matchedTransitionSource(id: "more", in: moreTransition)
+            }
+            ToolbarItem(placement: .primaryAction) {
                 Menu {
-                    Button(role: .destructive) {
-                        authManager.signOut()
-                    } label: {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                    Picker("Sort By", selection: $sortOrder) {
+                        ForEach(AppSortOrder.allCases, id: \.self) { order in
+                            Text(order.rawValue)
+                        }
                     }
                 } label: {
-                    Image(systemName: "gearshape")
+                    Image(systemName: "arrow.up.arrow.down")
                 }
             }
+        }
+        .sheet(isPresented: $showMore) {
+            MoreView()
+                .navigationTransition(.zoom(sourceID: "more", in: moreTransition))
         }
         .task {
             guard let api = authManager.api else { return }

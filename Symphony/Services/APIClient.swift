@@ -57,6 +57,22 @@ actor APIClient {
         return try decodeResponse(data)
     }
 
+    func delete(path: String) async throws {
+        let url = baseURL.appendingPathComponent(path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(try getToken())", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+        // 204 No Content is the expected success response for DELETE
+        if !(200...299).contains(http.statusCode) {
+            try validateResponse(response, data: data)
+        }
+    }
+
     func getData(url: URL) async throws -> Data {
         var request = URLRequest(url: url)
         request.setValue("Bearer \(try getToken())", forHTTPHeaderField: "Authorization")
