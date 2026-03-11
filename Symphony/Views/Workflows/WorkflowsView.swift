@@ -50,6 +50,17 @@ struct WorkflowsView: View {
             }
         }
         .navigationTitle(app.attributes.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                VStack(spacing: 4) {
+                    AppIconView(bundleId: app.attributes.bundleId)
+                        .frame(width: 30, height: 30)
+                    Text(app.attributes.name)
+                        .font(.subheadline)
+                }
+            }
+        }
         .sheet(isPresented: $showStartBuild) {
             if let workflow = selectedWorkflow, let api = authManager.api {
                 StartBuildView(workflow: workflow, api: api)
@@ -72,7 +83,9 @@ struct WorkflowsView: View {
     @ViewBuilder
     private func workflowSection(workflow: CiWorkflow, manager: WorkflowsManager) -> some View {
         Section {
-            let builds = manager.buildRunsByWorkflow[workflow.id] ?? []
+            let builds = (manager.buildRunsByWorkflow[workflow.id] ?? []).sorted {
+                    ($0.attributes.number ?? 0) > ($1.attributes.number ?? 0)
+                }
             if builds.isEmpty {
                 Text("No builds yet")
                     .font(.subheadline)
@@ -81,6 +94,10 @@ struct WorkflowsView: View {
                 ForEach(builds) { buildRun in
                     NavigationLink(value: buildRun) {
                         HStack {
+                            BuildStatusIcon(
+                                progress: buildRun.attributes.executionProgress,
+                                status: buildRun.attributes.completionStatus
+                            )
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Build #\(buildRun.attributes.number ?? 0)")
                                     .font(.headline)
@@ -92,11 +109,6 @@ struct WorkflowsView: View {
                                         .lineLimit(1)
                                 }
                             }
-                            Spacer()
-                            BuildStatusBadge(
-                                progress: buildRun.attributes.executionProgress,
-                                status: buildRun.attributes.completionStatus
-                            )
                         }
                     }
                     .swipeActions(edge: .trailing) {

@@ -49,7 +49,9 @@ struct BuildRunDetailView: View {
 
                         if !manager.actions.isEmpty {
                             Section("Actions") {
-                                ForEach(manager.actions) { action in
+                                ForEach(manager.actions.sorted {
+                                    ($0.attributes.startedDate ?? "") < ($1.attributes.startedDate ?? "")
+                                }) { action in
                                     Button {
                                         selectedAction = action
                                     } label: {
@@ -96,6 +98,7 @@ struct BuildRunDetailView: View {
             }
         }
         .navigationTitle("Build #\(buildRun.attributes.number ?? 0)")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedAction) { action in
             if let api = authManager.api {
                 BuildLogView(action: action, api: api)
