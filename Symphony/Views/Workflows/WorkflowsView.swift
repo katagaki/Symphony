@@ -2,10 +2,15 @@ import SwiftUI
 
 struct WorkflowsView: View {
     @Environment(AuthenticationManager.self) private var authManager
+    @Namespace private var namespace
     let app: CiApp
     @State private var manager: WorkflowsManager?
     @State private var selectedWorkflow: CiWorkflow?
+    @State private var selectedWorkflowForDetail: CiWorkflow?
     @State private var forceRefreshIcons = false
+    @State private var expandedWorkflows: Set<String> = []
+
+    private let initialBuildCount = 5
 
     var body: some View {
         Group {
@@ -74,6 +79,13 @@ struct WorkflowsView: View {
             if let api = authManager.api {
                 StartBuildView(workflow: workflow, api: api)
                     .interactiveDismissDisabled()
+                    .navigationTransition(.zoom(sourceID: "startBuild-\(workflow.id)", in: namespace))
+            }
+        }
+        .sheet(item: $selectedWorkflowForDetail) { workflow in
+            if let api = authManager.api {
+                WorkflowDetailView(workflow: workflow, api: api)
+                    .navigationTransition(.zoom(sourceID: "viewWorkflow-\(workflow.id)", in: namespace))
             }
         }
         .task {
@@ -101,7 +113,9 @@ struct WorkflowsView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(builds) { buildRun in
+                let isExpanded = expandedWorkflows.contains(workflow.id)
+                let visibleBuilds = isExpanded ? builds : Array(builds.prefix(initialBuildCount))
+                ForEach(visibleBuilds) { buildRun in
                     NavigationLink(value: buildRun) {
                         HStack {
                             BuildStatusIcon(
@@ -142,20 +156,34 @@ struct WorkflowsView: View {
                         }
                     }
                 }
+                if !isExpanded && builds.count > initialBuildCount {
+                    Button {
+                        withAnimation {
+                            _ = expandedWorkflows.insert(workflow.id)
+                        }
+                    } label: {
+                        Text("Workflows.ShowMore \(builds.count - initialBuildCount)")
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity)
+                    }
+                }
             }
         } header: {
             HStack {
                 Text(workflow.attributes.name)
                 Spacer()
                 Button {
+                    selectedWorkflowForDetail = workflow
+                } label: {
+                    Image(systemName: "info.circle")
+                }
+                .matchedTransitionSource(id: "viewWorkflow-\(workflow.id)", in: namespace)
+                Button {
                     selectedWorkflow = workflow
                 } label: {
-                    HStack(spacing: 2) {
-                        Image(systemName: "play.fill")
-                        Text("Build.Start.Title")
-                    }
-                    .font(.caption)
+                    Image(systemName: "play.fill")
                 }
+                .matchedTransitionSource(id: "startBuild-\(workflow.id)", in: namespace)
             }
         }
     }
