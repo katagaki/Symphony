@@ -98,6 +98,12 @@ struct WorkflowsView: View {
                                 status: buildRun.attributes.completionStatus
                             )
                         }
+                        .alignmentGuide(.listRowSeparatorLeading) { d in
+                            d[.leading]
+                        }
+                        .alignmentGuide(.listRowSeparatorTrailing) { d in
+                            d[.trailing]
+                        }
                     }
                     .swipeActions(edge: .trailing) {
                         if buildRun.attributes.executionProgress == .pending
