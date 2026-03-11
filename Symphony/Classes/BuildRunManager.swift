@@ -123,7 +123,7 @@ final class BuildRunManager {
         let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
         defer { destinationBuffer.deallocate() }
 
-        var stream = compression_stream()
+        var stream = compression_stream(dst_ptr: destinationBuffer, dst_size: bufferSize, src_ptr: UnsafePointer<UInt8>(bitPattern: 1)!, src_size: 0, state: nil)
         let initStatus = compression_stream_init(&stream, COMPRESSION_STREAM_DECODE, COMPRESSION_ZLIB)
         guard initStatus == COMPRESSION_STATUS_OK else { return nil }
         defer { compression_stream_destroy(&stream) }
