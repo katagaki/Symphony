@@ -4,7 +4,6 @@ struct WorkflowsView: View {
     @Environment(AuthenticationManager.self) private var authManager
     let app: CiApp
     @State private var manager: WorkflowsManager?
-    @State private var showStartBuild = false
     @State private var selectedWorkflow: CiWorkflow?
 
     var body: some View {
@@ -66,8 +65,8 @@ struct WorkflowsView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showStartBuild) {
-            if let workflow = selectedWorkflow, let api = authManager.api {
+        .sheet(item: $selectedWorkflow) { workflow in
+            if let api = authManager.api {
                 StartBuildView(workflow: workflow, api: api)
             }
         }
@@ -144,7 +143,6 @@ struct WorkflowsView: View {
                 Spacer()
                 Button {
                     selectedWorkflow = workflow
-                    showStartBuild = true
                 } label: {
                     HStack(spacing: 2) {
                         Image(systemName: "play.fill")
