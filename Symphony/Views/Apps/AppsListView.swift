@@ -9,6 +9,8 @@ struct AppsListView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @State private var appsManager: AppsManager?
     @State private var sortOrder: AppSortOrder = .name
+    @State private var showMore = false
+    @Namespace private var moreTransition
 
     private var sortedApps: [CiApp] {
         guard let apps = appsManager?.apps else { return [] }
@@ -58,15 +60,12 @@ struct AppsListView: View {
         .navigationTitle("Apps")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Menu {
-                    Button(role: .destructive) {
-                        authManager.signOut()
-                    } label: {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                    }
+                Button {
+                    showMore = true
                 } label: {
-                    Image(systemName: "gearshape")
+                    Image(systemName: "ellipsis")
                 }
+                .matchedTransitionSource(id: "more", in: moreTransition)
             }
             ToolbarItem(placement: .primaryAction) {
                 Menu {
@@ -79,6 +78,10 @@ struct AppsListView: View {
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
+        }
+        .sheet(isPresented: $showMore) {
+            MoreView()
+                .navigationTransition(.zoom(sourceID: "more", in: moreTransition))
         }
         .task {
             guard let api = authManager.api else { return }
