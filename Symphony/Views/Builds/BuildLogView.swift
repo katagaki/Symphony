@@ -38,7 +38,7 @@ struct BuildLogView: View {
             .navigationTitle(action.attributes.name ?? String(localized: "Build.Log.Title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(role: .cancel) {
                         dismiss()
                     }
