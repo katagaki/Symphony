@@ -39,7 +39,7 @@ struct BuildLogView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .close) {
+                    Button(role: .cancel) {
                         dismiss()
                     }
                 }
