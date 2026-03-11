@@ -45,6 +45,7 @@ struct WorkflowsView: View {
                             .padding(.vertical, 2)
                             .listRowBackground(Color.clear)
                         }
+                        .listSectionSpacing(0)
                         ForEach(manager.workflows) { workflow in
                             workflowSection(workflow: workflow, manager: manager)
                         }
