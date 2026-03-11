@@ -103,6 +103,7 @@ struct BuildRunDetailView: View {
                             }
                         }
                     }
+                    .contentMargins(.top, 0, for: .scrollContent)
                     .refreshable {
                         await manager.loadBuildRun(id: buildRun.id)
                     }
@@ -116,6 +117,7 @@ struct BuildRunDetailView: View {
         .sheet(item: $selectedAction) { action in
             if let api = authManager.api {
                 BuildLogView(action: action, api: api)
+                    .interactiveDismissDisabled()
             }
         }
         .task {
