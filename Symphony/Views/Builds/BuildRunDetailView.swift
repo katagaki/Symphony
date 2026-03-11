@@ -37,6 +37,19 @@ struct BuildRunDetailView: View {
                             if let created = manager.buildRun?.attributes.createdDate {
                                 LabeledContent("Build.Detail.Created", value: formatDate(created))
                             }
+                            if manager.buildRun?.attributes.executionProgress == .pending
+                                || manager.buildRun?.attributes.executionProgress == .running {
+                                Button(role: .destructive) {
+                                    Task {
+                                        if let id = manager.buildRun?.id {
+                                            await manager.cancelBuildRun(id: id)
+                                        }
+                                    }
+                                } label: {
+                                    Label("Build.Detail.CancelBuild", systemImage: "xmark.circle.fill")
+                                        .frame(maxWidth: .infinity)
+                                }
+                            }
                             if let started = manager.buildRun?.attributes.startedDate {
                                 LabeledContent("Build.Detail.Started", value: formatDate(started))
                             }

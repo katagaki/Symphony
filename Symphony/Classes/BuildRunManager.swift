@@ -56,6 +56,15 @@ final class BuildRunManager {
         isStartingBuild = false
     }
 
+    func cancelBuildRun(id: String) async {
+        do {
+            try await api.cancelBuildRun(id: id)
+            await loadBuildRun(id: id)
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
     func pollBuildStatus(id: String) async {
         while buildRun?.attributes.executionProgress != .complete {
             try? await Task.sleep(for: .seconds(10))

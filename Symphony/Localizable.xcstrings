@@ -131,6 +131,16 @@
         }
       }
     },
+    "Build.Detail.CancelBuild" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel Build"
+          }
+        }
+      }
+    },
     "Build.Detail.Finished" : {
       "localizations" : {
         "en" : {
