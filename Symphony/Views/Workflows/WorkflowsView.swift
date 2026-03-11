@@ -38,10 +38,10 @@ struct WorkflowsView: View {
                         Section {
                             VStack(spacing: 8) {
                                 AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
-                                    .frame(width: 64, height: 64)
+                                    .frame(width: 128, height: 128)
                                 VStack(spacing: 4) {
                                     Text(app.attributes.name)
-                                        .font(.headline)
+                                        .font(.title3)
                                     Text(app.attributes.bundleId)
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
@@ -108,7 +108,10 @@ struct WorkflowsView: View {
             let builds = (manager.buildRunsByWorkflow[workflow.id] ?? []).sorted {
                     ($0.attributes.number ?? 0) > ($1.attributes.number ?? 0)
                 }
-            if builds.isEmpty {
+            if manager.isLoadingBuilds {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else if builds.isEmpty {
                 Text("Workflows.NoBuildsYet")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -171,17 +174,19 @@ struct WorkflowsView: View {
         } header: {
             HStack {
                 Text(workflow.attributes.name)
-                Spacer()
                 Button {
                     selectedWorkflowForDetail = workflow
                 } label: {
                     Image(systemName: "info.circle")
+                        .foregroundStyle(.secondary)
                 }
                 .matchedTransitionSource(id: "viewWorkflow-\(workflow.id)", in: namespace)
+                Spacer()
                 Button {
                     selectedWorkflow = workflow
                 } label: {
-                    Image(systemName: "play.fill")
+                    Label("Workflows.StartBuild", systemImage: "play.fill")
+                        .imageScale(.large)
                 }
                 .matchedTransitionSource(id: "startBuild-\(workflow.id)", in: namespace)
             }

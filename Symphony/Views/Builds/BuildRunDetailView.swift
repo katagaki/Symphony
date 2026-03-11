@@ -5,6 +5,7 @@ struct BuildRunDetailView: View {
     let buildRun: CiBuildRun
     @State private var manager: BuildRunManager?
     @State private var selectedAction: CiBuildAction?
+    @State private var showCancelConfirmation = false
 
     var body: some View {
         Group {
@@ -14,14 +15,14 @@ struct BuildRunDetailView: View {
                 } else {
                     List {
                         Section {
-                            VStack(spacing: 8) {
+                            VStack(spacing: 4) {
                                 let badge = BuildStatusBadge(
                                     progress: manager.buildRun?.attributes.executionProgress,
                                     status: manager.buildRun?.attributes.completionStatus
                                 )
                                 Image(systemName: badge.iconName)
                                     .font(.system(size: 56))
-                                    .symbolRenderingMode(.multicolor)
+                                    .symbolRenderingMode(.hierarchical)
                                     .foregroundStyle(badge.iconColor)
                                 Text(badge.labelText)
                                     .font(.headline)
@@ -36,6 +37,15 @@ struct BuildRunDetailView: View {
                         Section {
                             if let created = manager.buildRun?.attributes.createdDate {
                                 LabeledContent("Build.Detail.Created", value: formatDate(created))
+                            }
+                            if manager.buildRun?.attributes.executionProgress == .pending
+                                || manager.buildRun?.attributes.executionProgress == .running {
+                                Button(role: .destructive) {
+                                    showCancelConfirmation = true
+                                } label: {
+                                    Label("Build.Detail.CancelBuild", systemImage: "xmark.circle.fill")
+                                        .frame(maxWidth: .infinity)
+                                }
                             }
                             if let started = manager.buildRun?.attributes.startedDate {
                                 LabeledContent("Build.Detail.Started", value: formatDate(started))
@@ -73,20 +83,19 @@ struct BuildRunDetailView: View {
                                             VStack(alignment: .leading, spacing: 4) {
                                                 Text(action.attributes.name ?? action.attributes.actionType ?? String(localized: "Build.Actions.Action"))
                                                     .font(.headline)
-                                                    .foregroundStyle(.primary)
                                                 if let issues = action.attributes.issueCounts {
                                                     HStack(spacing: 12) {
                                                         if let errors = issues.errors, errors > 0 {
                                                             Label("\(errors)", systemImage: "xmark.circle.fill")
-                                                                .foregroundStyle(.red)
+                                                                .symbolRenderingMode(.multicolor)
                                                         }
                                                         if let warnings = issues.warnings, warnings > 0 {
                                                             Label("\(warnings)", systemImage: "exclamationmark.triangle.fill")
-                                                                .foregroundStyle(.orange)
+                                                                .symbolRenderingMode(.multicolor)
                                                         }
                                                         if let failures = issues.testFailures, failures > 0 {
                                                             Label("\(failures)", systemImage: "xmark.diamond.fill")
-                                                                .foregroundStyle(.red)
+                                                                .symbolRenderingMode(.multicolor)
                                                         }
                                                     }
                                                     .font(.caption)
@@ -99,6 +108,7 @@ struct BuildRunDetailView: View {
                                             )
                                         }
                                     }
+                                    .tint(.primary)
                                 }
                             }
                         }
@@ -119,6 +129,18 @@ struct BuildRunDetailView: View {
                 BuildLogView(action: action, api: api)
                     .interactiveDismissDisabled()
             }
+        }
+        .alert("Build.Detail.CancelBuild", isPresented: $showCancelConfirmation) {
+            Button("Build.Detail.CancelBuild", role: .destructive) {
+                Task {
+                    if let id = manager?.buildRun?.id {
+                        await manager?.cancelBuildRun(id: id)
+                    }
+                }
+            }
+            Button("Shared.Cancel", role: .cancel) {}
+        } message: {
+            Text("Build.Detail.CancelConfirmation")
         }
         .task {
             guard let api = authManager.api else { return }

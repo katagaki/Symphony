@@ -7,6 +7,7 @@ final class WorkflowsManager {
     var buildRunsByWorkflow: [String: [CiBuildRun]] = [:]
     var branchNamesByBuildRun: [String: String] = [:]
     var isLoading: Bool = false
+    var isLoadingBuilds: Bool = false
     var isRefreshing: Bool = false
     var error: String?
 
@@ -31,7 +32,9 @@ final class WorkflowsManager {
             let product = try await api.getCiProduct(forAppID: app.id)
             productID = product.id
             workflows = try await api.listWorkflows(forProductID: product.id)
+            isLoadingBuilds = true
             await loadBuildRunsPerWorkflow()
+            isLoadingBuilds = false
         } catch {
             self.error = error.localizedDescription
         }

@@ -71,6 +71,16 @@
         }
       }
     },
+    "Apps.SearchPrompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Name, Bundle ID"
+          }
+        }
+      }
+    },
     "Apps.Title" : {
       "localizations" : {
         "en" : {
@@ -117,6 +127,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Created"
+          }
+        }
+      }
+    },
+    "Build.Detail.CancelBuild" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel Build"
+          }
+        }
+      }
+    },
+    "Build.Detail.CancelConfirmation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to cancel this build?"
           }
         }
       }
@@ -737,6 +767,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No builds yet"
+          }
+        }
+      }
+    },
+    "Workflows.StartBuild" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Build"
           }
         }
       }

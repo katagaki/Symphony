@@ -42,15 +42,18 @@ struct WorkflowDetailView: View {
                                 if wf.attributes.isEnabled == true {
                                     Label("Workflow.Detail.Yes", systemImage: "checkmark.circle.fill")
                                         .foregroundStyle(.green)
+                                        .labelStyle(.iconOnly)
                                 } else {
                                     Label("Workflow.Detail.No", systemImage: "xmark.circle.fill")
                                         .foregroundStyle(.secondary)
+                                        .labelStyle(.iconOnly)
                                 }
                             }
                             if wf.attributes.isLockedForEditing == true {
                                 LabeledContent("Workflow.Detail.Locked") {
                                     Label("Workflow.Detail.Yes", systemImage: "lock.fill")
                                         .foregroundStyle(.orange)
+                                        .labelStyle(.iconOnly)
                                 }
                             }
                         }
@@ -63,13 +66,14 @@ struct WorkflowDetailView: View {
                             }
                         }
                     }
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                 }
             }
             .navigationTitle("Workflow.Detail.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Shared.Done") {
+                    Button(role: .close) {
                         dismiss()
                     }
                 }
