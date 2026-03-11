@@ -159,7 +159,7 @@ struct WorkflowsView: View {
                 if !isExpanded && builds.count > initialBuildCount {
                     Button {
                         withAnimation {
-                            expandedWorkflows.insert(workflow.id)
+                            _ = expandedWorkflows.insert(workflow.id)
                         }
                     } label: {
                         Text("Workflows.ShowMore \(builds.count - initialBuildCount)")
