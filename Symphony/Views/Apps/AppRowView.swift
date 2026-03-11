@@ -55,7 +55,7 @@ struct AppIconView: View {
     private var placeholderIcon: some View {
         RoundedRectangle(cornerRadius: 14, style: .continuous)
             .fill(.clear)
-            .glassEffect(.regular.interactive, in: .rect(cornerRadius: 14, style: .continuous))
+            .glassEffect(.regular, in: .rect(cornerRadius: 14, style: .continuous))
     }
 
     private static func fetchIconURL(bundleId: String) async -> URL? {
