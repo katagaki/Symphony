@@ -54,7 +54,11 @@ struct AppIconView: View {
 
     private var placeholderIcon: some View {
         RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(.ultraThinMaterial)
+            .fill(.secondary.opacity(0.15))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(.secondary.opacity(0.3), lineWidth: 0.5)
+            }
     }
 
     private static func fetchIconURL(bundleId: String) async -> URL? {
