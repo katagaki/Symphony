@@ -51,6 +51,7 @@ struct WorkflowsView: View {
                             workflowSection(workflow: workflow, manager: manager)
                         }
                     }
+                    .contentMargins(.top, 0, for: .scrollContent)
                     .refreshable {
                         forceRefreshIcons = true
                         await manager.loadWorkflows()
@@ -72,6 +73,7 @@ struct WorkflowsView: View {
         .sheet(item: $selectedWorkflow) { workflow in
             if let api = authManager.api {
                 StartBuildView(workflow: workflow, api: api)
+                    .interactiveDismissDisabled()
             }
         }
         .task {
