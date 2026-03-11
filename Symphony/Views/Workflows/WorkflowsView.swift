@@ -5,6 +5,7 @@ struct WorkflowsView: View {
     let app: CiApp
     @State private var manager: WorkflowsManager?
     @State private var selectedWorkflow: CiWorkflow?
+    @State private var forceRefreshIcons = false
 
     var body: some View {
         Group {
@@ -31,7 +32,7 @@ struct WorkflowsView: View {
                     List {
                         Section {
                             VStack(spacing: 8) {
-                                AppIconView(bundleId: app.attributes.bundleId)
+                                AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
                                     .frame(width: 64, height: 64)
                                 VStack(spacing: 4) {
                                     Text(app.attributes.name)
@@ -45,12 +46,15 @@ struct WorkflowsView: View {
                             .padding(.vertical, 2)
                             .listRowBackground(Color.clear)
                         }
+                        .listSectionSpacing(0)
                         ForEach(manager.workflows) { workflow in
                             workflowSection(workflow: workflow, manager: manager)
                         }
                     }
                     .refreshable {
+                        forceRefreshIcons = true
                         await manager.loadWorkflows()
+                        forceRefreshIcons = false
                     }
                     .overlay(alignment: .topTrailing) {
                         if manager.isRefreshing {

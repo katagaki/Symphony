@@ -31,6 +31,7 @@ struct BuildRunDetailView: View {
                             .padding(.vertical, 4)
                         }
                         .listRowBackground(Color.clear)
+                        .listSectionSpacing(0)
 
                         Section {
                             if let created = manager.buildRun?.attributes.createdDate {
