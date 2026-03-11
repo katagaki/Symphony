@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct BuildLogView: View {
-    @Environment(\.dismiss) private var dismiss
     let action: CiBuildAction
     @State private var manager: BuildRunManager
 
@@ -20,13 +19,8 @@ struct BuildLogView: View {
                             .foregroundStyle(.secondary)
                     }
                 } else if let logText = manager.logText {
-                    ScrollView {
-                        Text(logText)
-                            .font(.system(.caption2, design: .monospaced))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding()
-                            .textSelection(.enabled)
-                    }
+                    TextEditor(text: .constant(logText))
+                        .font(.system(.caption2, design: .monospaced))
                 } else {
                     ContentUnavailableView(
                         "Build.Log.NoLogs",
@@ -39,7 +33,7 @@ struct BuildLogView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Shared.Done") { dismiss() }
+                    Button(role: .close) { }
                 }
             }
             .task {
