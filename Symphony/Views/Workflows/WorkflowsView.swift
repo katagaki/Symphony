@@ -41,7 +41,8 @@ struct WorkflowsView: View {
                                     .frame(width: 128, height: 128)
                                 VStack(spacing: 4) {
                                     Text(app.attributes.name)
-                                        .font(.title3)
+                                        .font(.title2)
+                                        .bold()
                                     Text(app.attributes.bundleId)
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
@@ -62,12 +63,17 @@ struct WorkflowsView: View {
                         await manager.loadWorkflows()
                         forceRefreshIcons = false
                     }
-                    .overlay(alignment: .topTrailing) {
-                        if manager.isRefreshing {
-                            ProgressView()
-                                .controlSize(.small)
-                                .padding(8)
+                    .toolbar {
+                        ToolbarItemGroup(placement: .topBarTrailing) {
+                            Group {
+                                if manager.isRefreshing {
+                                    ProgressView()
+                                } else {
+                                    EmptyView()
+                                }
+                            }
                         }
+                        .sharedBackgroundVisibility(.hidden)
                     }
                 }
             } else {
@@ -120,7 +126,7 @@ struct WorkflowsView: View {
                 let visibleBuilds = isExpanded ? builds : Array(builds.prefix(initialBuildCount))
                 ForEach(visibleBuilds) { buildRun in
                     NavigationLink(value: buildRun) {
-                        HStack {
+                        HStack(spacing: 16) {
                             BuildStatusIcon(
                                 progress: buildRun.attributes.executionProgress,
                                 status: buildRun.attributes.completionStatus
@@ -172,7 +178,7 @@ struct WorkflowsView: View {
                 }
             }
         } header: {
-            HStack {
+            HStack(alignment: .bottom) {
                 Text(workflow.attributes.name)
                 Button {
                     selectedWorkflowForDetail = workflow
@@ -180,14 +186,17 @@ struct WorkflowsView: View {
                     Image(systemName: "info.circle")
                         .foregroundStyle(.secondary)
                 }
+                .tint(.primary)
                 .matchedTransitionSource(id: "viewWorkflow-\(workflow.id)", in: namespace)
                 Spacer()
                 Button {
                     selectedWorkflow = workflow
                 } label: {
-                    Label("Workflows.StartBuild", systemImage: "play.fill")
-                        .imageScale(.large)
+                    Text("Workflows.StartBuild")
+                        .labelIconToTitleSpacing(4)
                 }
+                .controlSize(.regular)
+                .buttonStyle(.glassProminent)
                 .matchedTransitionSource(id: "startBuild-\(workflow.id)", in: namespace)
             }
         }

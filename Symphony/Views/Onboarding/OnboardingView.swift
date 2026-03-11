@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 struct OnboardingView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @State private var showFilePicker = false
+    @State private var gearRotation: Double = 0
 
     var body: some View {
         @Bindable var auth = authManager
@@ -12,21 +13,37 @@ struct OnboardingView: View {
             Form {
                 Section {
                     VStack(spacing: 12) {
-                        Image(systemName: "cloud.fill")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.tint)
-                        Text("Onboarding.Welcome")
-                            .font(.title2)
-                            .fontWeight(.bold)
+                        ZStack {
+                            Image("ConductorGear")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 128, height: 128)
+                                .foregroundStyle(.tint)
+                                .rotationEffect(.degrees(gearRotation))
+                                .onAppear {
+                                    withAnimation(
+                                        .linear(duration: 30)
+                                        .repeatForever(autoreverses: false)
+                                    ) {
+                                        gearRotation = 360
+                                    }
+                                }
+                            Image("ConductorApp")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 128, height: 128)
+                                .foregroundStyle(.tint)
+                        }
                         Text("Onboarding.Description")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical)
                     .listRowBackground(Color.clear)
+                    .listRowInsets(.init())
                 }
+                .listSectionSpacing(.zero)
 
                 Section {
                     TextField("Onboarding.IssuerID", text: $auth.issuerID)
@@ -90,6 +107,7 @@ struct OnboardingView: View {
                 }
             }
             .navigationTitle("Onboarding.Title")
+            .toolbarTitleDisplayMode(.inline)
             .fileImporter(
                 isPresented: $showFilePicker,
                 allowedContentTypes: [

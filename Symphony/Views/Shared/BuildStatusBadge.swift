@@ -7,11 +7,14 @@ struct BuildStatusBadge: View {
     var body: some View {
         Label {
             Text(labelText)
+                .foregroundStyle(.secondary)
         } icon: {
             Image(systemName: iconName)
                 .foregroundStyle(iconColor)
+                .symbolRenderingMode(.hierarchical)
         }
-        .font(.caption)
+        .labelIconToTitleSpacing(4)
+        .font(.subheadline)
     }
 
     var labelText: String {
@@ -76,21 +79,11 @@ struct BuildStatusIcon: View {
     let progress: ExecutionProgress?
     let status: CompletionStatus?
 
-    private var isInProgress: Bool {
-        guard let progress else { return false }
-        return progress == .pending || progress == .running
-    }
-
     var body: some View {
-        if isInProgress {
-            ProgressView()
-                .controlSize(.regular)
-        } else {
-            let badge = BuildStatusBadge(progress: progress, status: status)
-            Image(systemName: badge.iconName)
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(badge.iconColor)
-                .imageScale(.large)
-        }
+        let badge = BuildStatusBadge(progress: progress, status: status)
+        Image(systemName: badge.iconName)
+            .symbolRenderingMode(.hierarchical)
+            .foregroundStyle(badge.iconColor)
+            .font(.title)
     }
 }

@@ -76,7 +76,9 @@ struct AppsListView: View {
         .animation(.smooth.speed(2.0), value: searchText)
         .navigationTitle("Apps.Title")
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItemGroup(placement: .bottomBar) {
                 Menu {
                     Picker("Apps.SortBy", selection: $sortOrder) {
                         ForEach(AppSortOrder.allCases, id: \.self) { order in
@@ -87,7 +89,6 @@ struct AppsListView: View {
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
-            ToolbarSpacer(.fixed)
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Menu {
                     Button(role: .destructive) {

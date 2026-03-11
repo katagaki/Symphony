@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld" : {
+
+    },
     "Apps.FailedToLoad" : {
       "localizations" : {
         "en" : {
@@ -41,6 +44,16 @@
         }
       }
     },
+    "Apps.SearchPrompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Name, Bundle ID"
+          }
+        }
+      }
+    },
     "Apps.Sort.BundleID" : {
       "localizations" : {
         "en" : {
@@ -67,16 +80,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sort By"
-          }
-        }
-      }
-    },
-    "Apps.SearchPrompt" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App Name, Bundle ID"
           }
         }
       }
@@ -121,16 +124,6 @@
         }
       }
     },
-    "Build.Detail.Created" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Created"
-          }
-        }
-      }
-    },
     "Build.Detail.CancelBuild" : {
       "localizations" : {
         "en" : {
@@ -147,6 +140,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Are you sure you want to cancel this build?"
+          }
+        }
+      }
+    },
+    "Build.Detail.Created" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created"
           }
         }
       }
@@ -251,22 +254,22 @@
         }
       }
     },
-    "Build.Start.BranchOrTag" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Branch or Tag"
-          }
-        }
-      }
-    },
     "Build.Start.Branches" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Branches"
+          }
+        }
+      }
+    },
+    "Build.Start.BranchOrTag" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Branch or Tag"
           }
         }
       }
@@ -441,6 +444,9 @@
         }
       }
     },
+    "katagaki/Symphony" : {
+
+    },
     "More.Title" : {
       "localizations" : {
         "en" : {
@@ -496,7 +502,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Connect your App Store Connect account to manage Xcode Cloud builds."
+            "value" : "Connect your App Store Connect account to manage Xcode Cloud builds. Your API key should have Admin permissions."
           }
         }
       }
@@ -556,17 +562,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Setup"
-          }
-        }
-      }
-    },
-    "Onboarding.Welcome" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Welcome to Symphony"
+            "value" : "Welcome to Conductor"
           }
         }
       }
@@ -577,16 +573,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
-          }
-        }
-      }
-    },
-    "Shared.Done" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
           }
         }
       }
@@ -771,26 +757,6 @@
         }
       }
     },
-    "Workflows.StartBuild" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Start Build"
-          }
-        }
-      }
-    },
-    "Workflows.ShowMore %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show %lld More Builds"
-          }
-        }
-      }
-    },
     "Workflows.NoWorkflows" : {
       "localizations" : {
         "en" : {
@@ -807,6 +773,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No Xcode Cloud workflows found for this app."
+          }
+        }
+      }
+    },
+    "Workflows.ShowMore %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show %lld More Builds"
+          }
+        }
+      }
+    },
+    "Workflows.StartBuild" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Build"
           }
         }
       }

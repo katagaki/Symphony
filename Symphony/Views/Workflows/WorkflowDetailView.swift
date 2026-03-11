@@ -38,24 +38,27 @@ struct WorkflowDetailView: View {
                         }
 
                         Section("Workflow.Detail.Status") {
-                            LabeledContent("Workflow.Detail.Enabled") {
-                                if wf.attributes.isEnabled == true {
-                                    Label("Workflow.Detail.Yes", systemImage: "checkmark.circle.fill")
-                                        .foregroundStyle(.green)
-                                        .labelStyle(.iconOnly)
-                                } else {
-                                    Label("Workflow.Detail.No", systemImage: "xmark.circle.fill")
-                                        .foregroundStyle(.secondary)
-                                        .labelStyle(.iconOnly)
+                            Group {
+                                LabeledContent("Workflow.Detail.Enabled") {
+                                    if wf.attributes.isEnabled == true {
+                                        Label("Workflow.Detail.Yes", systemImage: "checkmark.circle.fill")
+                                            .foregroundStyle(.green)
+                                            .labelStyle(.iconOnly)
+                                    } else {
+                                        Label("Workflow.Detail.No", systemImage: "xmark.circle.fill")
+                                            .foregroundStyle(.secondary)
+                                            .labelStyle(.iconOnly)
+                                    }
+                                }
+                                if wf.attributes.isLockedForEditing == true {
+                                    LabeledContent("Workflow.Detail.Locked") {
+                                        Label("Workflow.Detail.Yes", systemImage: "lock.fill")
+                                            .foregroundStyle(.orange)
+                                            .labelStyle(.iconOnly)
+                                    }
                                 }
                             }
-                            if wf.attributes.isLockedForEditing == true {
-                                LabeledContent("Workflow.Detail.Locked") {
-                                    Label("Workflow.Detail.Yes", systemImage: "lock.fill")
-                                        .foregroundStyle(.orange)
-                                        .labelStyle(.iconOnly)
-                                }
-                            }
+                            .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                         }
 
                         if let lastModified = wf.attributes.lastModifiedDate {
@@ -79,7 +82,7 @@ struct WorkflowDetailView: View {
                 }
             }
         }
-        .presentationDetents([.large])
+        .presentationDetents([.medium])
         .task {
             await loadWorkflow()
         }

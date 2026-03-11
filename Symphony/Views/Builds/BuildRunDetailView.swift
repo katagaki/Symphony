@@ -32,7 +32,7 @@ struct BuildRunDetailView: View {
                             .padding(.vertical, 4)
                         }
                         .listRowBackground(Color.clear)
-                        .listSectionSpacing(0)
+                        .listSectionSpacing(.zero)
 
                         Section {
                             if let created = manager.buildRun?.attributes.createdDate {
@@ -43,7 +43,7 @@ struct BuildRunDetailView: View {
                                 Button(role: .destructive) {
                                     showCancelConfirmation = true
                                 } label: {
-                                    Label("Build.Detail.CancelBuild", systemImage: "xmark.circle.fill")
+                                    Text("Build.Detail.CancelBuild")
                                         .frame(maxWidth: .infinity)
                                 }
                             }
@@ -109,6 +109,7 @@ struct BuildRunDetailView: View {
                                         }
                                     }
                                     .tint(.primary)
+                                    .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                                 }
                             }
                         }

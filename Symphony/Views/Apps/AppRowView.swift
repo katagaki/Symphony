@@ -27,36 +27,46 @@ struct AppIconView: View {
     @State private var didLoad = false
 
     var body: some View {
-        Group {
-            if let iconURL {
-                AsyncImage(url: iconURL) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    case .failure:
-                        placeholderIcon
-                    default:
+        GeometryReader { geometry in
+            let cornerRadius = geometry.size.width * (13.0 / 60.0)
+            Group {
+                if let iconURL {
+                    AsyncImage(url: iconURL) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .clipShape(.rect(cornerRadius: cornerRadius))
+                        case .failure:
+                            placeholderIcon(cornerRadius: cornerRadius)
+                        default:
+                            ZStack(alignment: .center) {
+                                placeholderIcon(cornerRadius: cornerRadius)
+                                ProgressView()
+                            }
+                        }
+                    }
+                } else if didLoad {
+                    placeholderIcon(cornerRadius: cornerRadius)
+                } else {
+                    ZStack(alignment: .center) {
+                        placeholderIcon(cornerRadius: cornerRadius)
                         ProgressView()
                     }
                 }
-            } else if didLoad {
-                placeholderIcon
-            } else {
-                ProgressView()
             }
         }
+        .aspectRatio(1, contentMode: .fit)
         .task(id: forceRefresh) {
             iconURL = await AppIconCache.shared.iconURL(for: bundleId, forceRefresh: forceRefresh)
             didLoad = true
         }
     }
 
-    private var placeholderIcon: some View {
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
+    private func placeholderIcon(cornerRadius: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             .fill(.clear)
-            .glassEffect(.regular, in: .rect(cornerRadius: 14, style: .continuous))
+            .glassEffect(.regular, in: .rect(cornerRadius: cornerRadius, style: .continuous))
     }
 }

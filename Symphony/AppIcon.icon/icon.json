@@ -1,8 +1,8 @@
 {
   "fill" : {
     "linear-gradient" : [
-      "srgb:0.74877,0.92483,0.72368,1.00000",
-      "srgb:0.23948,1.00000,0.57724,1.00000"
+      "srgb:0.61859,0.92483,0.50061,1.00000",
+      "srgb:0.00917,0.61365,0.14730,1.00000"
     ],
     "orientation" : {
       "start" : {
@@ -16,7 +16,128 @@
     }
   },
   "groups" : [
-
+    {
+      "blur-material" : 0.5,
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "srgb:0.85550,1.00000,0.52750,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "srgb:0.53685,0.90990,0.31082,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Conductor.004.png",
+          "name" : "Conductor.004"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency-specializations" : [
+        {
+          "value" : {
+            "enabled" : true,
+            "value" : 0.8
+          }
+        },
+        {
+          "appearance" : "dark",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.6
+          }
+        },
+        {
+          "appearance" : "tinted",
+          "value" : {
+            "enabled" : true,
+            "value" : 1
+          }
+        }
+      ]
+    },
+    {
+      "hidden" : true,
+      "layers" : [
+        {
+          "image-name" : "Conductor.005.png",
+          "name" : "Conductor.005"
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blur-material-specializations" : [
+        {
+          "value" : 0.08
+        },
+        {
+          "appearance" : "tinted",
+          "value" : 0.08
+        }
+      ],
+      "hidden" : false,
+      "layers" : [
+        {
+          "image-name" : "Conductor.006.png",
+          "name" : "Conductor.006",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.85
+      }
+    },
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "image-name" : "Conductor.010.png",
+          "name" : "Conductor.010",
+          "position" : {
+            "scale" : 0.44,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
   ],
   "supported-platforms" : {
     "circles" : [
