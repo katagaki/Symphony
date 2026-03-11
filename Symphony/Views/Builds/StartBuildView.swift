@@ -96,7 +96,10 @@ struct StartBuildView: View {
                                     .padding(.trailing, 8)
                                 Text("Starting Build...")
                             } else {
-                                Label("Start Build", systemImage: "play.fill")
+                                HStack(spacing: 4) {
+                                    Image(systemName: "play.fill")
+                                    Text("Start Build")
+                                }
                             }
                             Spacer()
                         }

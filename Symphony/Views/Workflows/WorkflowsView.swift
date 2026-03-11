@@ -31,10 +31,10 @@ struct WorkflowsView: View {
                 } else {
                     List {
                         Section {
-                            HStack(spacing: 12) {
+                            VStack(spacing: 8) {
                                 AppIconView(bundleId: app.attributes.bundleId)
                                     .frame(width: 64, height: 64)
-                                VStack(alignment: .leading, spacing: 4) {
+                                VStack(spacing: 4) {
                                     Text(app.attributes.name)
                                         .font(.headline)
                                     Text(app.attributes.bundleId)
@@ -42,6 +42,7 @@ struct WorkflowsView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
+                            .frame(maxWidth: .infinity)
                             .padding(.vertical, 2)
                             .listRowBackground(Color.clear)
                         }
@@ -64,7 +65,6 @@ struct WorkflowsView: View {
                 ProgressView()
             }
         }
-        .navigationTitle(app.attributes.name)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showStartBuild) {
             if let workflow = selectedWorkflow, let api = authManager.api {
@@ -107,9 +107,12 @@ struct WorkflowsView: View {
                                 Text("Build #\(buildRun.attributes.number ?? 0)")
                                     .font(.headline)
                                 if let branchName = manager.branchNamesByBuildRun[buildRun.id] {
-                                    Label(branchName, systemImage: "arrow.triangle.branch")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                    HStack(spacing: 2) {
+                                        Image(systemName: "arrow.triangle.branch")
+                                        Text(branchName)
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                                 }
                                 if let commit = buildRun.attributes.sourceCommit,
                                    let message = commit.message {
@@ -143,8 +146,11 @@ struct WorkflowsView: View {
                     selectedWorkflow = workflow
                     showStartBuild = true
                 } label: {
-                    Label("Start Build", systemImage: "play.fill")
-                        .font(.caption)
+                    HStack(spacing: 2) {
+                        Image(systemName: "play.fill")
+                        Text("Start Build")
+                    }
+                    .font(.caption)
                 }
             }
         }

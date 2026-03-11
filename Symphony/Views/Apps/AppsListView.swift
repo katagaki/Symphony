@@ -70,9 +70,7 @@ struct AppsListView: View {
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
-            ToolbarItem(placement: .primaryAction) {
-                Spacer()
-            }
+            ToolbarSpacer(.fixed)
             ToolbarItemGroup(placement: .primaryAction) {
                 Menu {
                     Button(role: .destructive) {
@@ -84,9 +82,7 @@ struct AppsListView: View {
                     Button {
                         openURL(URL(string: "https://github.com/katagaki/Symphony")!)
                     } label: {
-                        LabeledContent("Source Code") {
-                            Text("katagaki/Symphony")
-                        }
+                        Label("Source Code", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
                 } label: {
                     Image(systemName: "ellipsis")
