@@ -16,16 +16,21 @@ struct AppsListView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @State private var appsManager: AppsManager?
     @State private var sortOrder: AppSortOrder = .name
+    @State private var searchText = ""
     @State private var forceRefreshIcons = false
     @Environment(\.openURL) private var openURL
 
-    private var sortedApps: [CiApp] {
+    private var filteredAndSortedApps: [CiApp] {
         guard let apps = appsManager?.apps else { return [] }
+        let filtered = searchText.isEmpty ? apps : apps.filter {
+            $0.attributes.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.attributes.bundleId.localizedCaseInsensitiveContains(searchText)
+        }
         switch sortOrder {
         case .name:
-            return apps.sorted { $0.attributes.name.localizedCaseInsensitiveCompare($1.attributes.name) == .orderedAscending }
+            return filtered.sorted { $0.attributes.name.localizedCaseInsensitiveCompare($1.attributes.name) == .orderedAscending }
         case .bundleId:
-            return apps.sorted { $0.attributes.bundleId.localizedCaseInsensitiveCompare($1.attributes.bundleId) == .orderedAscending }
+            return filtered.sorted { $0.attributes.bundleId.localizedCaseInsensitiveCompare($1.attributes.bundleId) == .orderedAscending }
         }
     }
 
@@ -51,7 +56,7 @@ struct AppsListView: View {
                         description: Text("Apps.NoAppsDescription")
                     )
                 } else {
-                    List(sortedApps) { app in
+                    List(filteredAndSortedApps) { app in
                         NavigationLink(value: app) {
                             AppRowView(app: app, forceRefreshIcons: forceRefreshIcons)
                         }
@@ -67,6 +72,8 @@ struct AppsListView: View {
                 ProgressView()
             }
         }
+        .searchable(text: $searchText)
+        .animation(.smooth.speed(2.0), value: searchText)
         .navigationTitle("Apps.Title")
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
