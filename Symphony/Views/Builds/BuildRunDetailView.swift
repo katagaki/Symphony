@@ -15,7 +15,7 @@ struct BuildRunDetailView: View {
                 } else {
                     List {
                         Section {
-                            VStack(spacing: 8) {
+                            VStack(spacing: 4) {
                                 let badge = BuildStatusBadge(
                                     progress: manager.buildRun?.attributes.executionProgress,
                                     status: manager.buildRun?.attributes.completionStatus
