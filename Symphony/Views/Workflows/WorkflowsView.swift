@@ -79,13 +79,13 @@ struct WorkflowsView: View {
             if let api = authManager.api {
                 StartBuildView(workflow: workflow, api: api)
                     .interactiveDismissDisabled()
-                    .navigationTransition(.zoom(sourceID: "startBuild-\(workflow.id)", isSource: false))
+                    .navigationTransition(.zoom(sourceID: "startBuild-\(workflow.id)", in: namespace))
             }
         }
         .sheet(item: $selectedWorkflowForDetail) { workflow in
             if let api = authManager.api {
                 WorkflowDetailView(workflow: workflow, api: api)
-                    .navigationTransition(.zoom(sourceID: "viewWorkflow-\(workflow.id)", isSource: false))
+                    .navigationTransition(.zoom(sourceID: "viewWorkflow-\(workflow.id)", in: namespace))
             }
         }
         .task {
