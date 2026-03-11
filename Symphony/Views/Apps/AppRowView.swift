@@ -53,11 +53,8 @@ struct AppIconView: View {
     }
 
     private var placeholderIcon: some View {
-        Image(systemName: "app.fill")
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .foregroundStyle(.secondary)
-            .padding(12)
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .fill(.ultraThinMaterial)
     }
 
     private static func fetchIconURL(bundleId: String) async -> URL? {
