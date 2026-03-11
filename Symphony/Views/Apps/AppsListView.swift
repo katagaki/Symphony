@@ -1,8 +1,24 @@
 import SwiftUI
 
+enum AppSortOrder: String, CaseIterable {
+    case name = "Name"
+    case bundleId = "Bundle ID"
+}
+
 struct AppsListView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @State private var appsManager: AppsManager?
+    @State private var sortOrder: AppSortOrder = .name
+
+    private var sortedApps: [CiApp] {
+        guard let apps = appsManager?.apps else { return [] }
+        switch sortOrder {
+        case .name:
+            return apps.sorted { $0.attributes.name.localizedCaseInsensitiveCompare($1.attributes.name) == .orderedAscending }
+        case .bundleId:
+            return apps.sorted { $0.attributes.bundleId.localizedCaseInsensitiveCompare($1.attributes.bundleId) == .orderedAscending }
+        }
+    }
 
     var body: some View {
         Group {
@@ -26,7 +42,7 @@ struct AppsListView: View {
                         description: Text("No apps found in your App Store Connect account.")
                     )
                 } else {
-                    List(manager.apps) { app in
+                    List(sortedApps) { app in
                         NavigationLink(value: app) {
                             AppRowView(app: app)
                         }
@@ -50,6 +66,17 @@ struct AppsListView: View {
                     }
                 } label: {
                     Image(systemName: "gearshape")
+                }
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Menu {
+                    Picker("Sort By", selection: $sortOrder) {
+                        ForEach(AppSortOrder.allCases, id: \.self) { order in
+                            Text(order.rawValue)
+                        }
+                    }
+                } label: {
+                    Image(systemName: "arrow.up.arrow.down")
                 }
             }
         }
