@@ -71,6 +71,16 @@
         }
       }
     },
+    "Apps.SearchPrompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App Name, Bundle ID"
+          }
+        }
+      }
+    },
     "Apps.Title" : {
       "localizations" : {
         "en" : {

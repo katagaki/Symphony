@@ -72,7 +72,7 @@ struct AppsListView: View {
                 ProgressView()
             }
         }
-        .searchable(text: $searchText)
+        .searchable(text: $searchText, prompt: Text("Apps.SearchPrompt"))
         .animation(.smooth.speed(2.0), value: searchText)
         .navigationTitle("Apps.Title")
         .toolbar {
