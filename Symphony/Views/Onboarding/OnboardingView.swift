@@ -105,6 +105,20 @@ struct OnboardingView: View {
                     }
                     .disabled(!authManager.canConnect || authManager.isValidating)
                 }
+
+                Section {
+                    Button {
+                        authManager.enterDemoMode()
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text("Onboarding.DemoMode")
+                            Spacer()
+                        }
+                    }
+                } footer: {
+                    Text("Onboarding.DemoModeFooter")
+                }
             }
             .navigationTitle("Onboarding.Title")
             .toolbarTitleDisplayMode(.inline)

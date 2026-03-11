@@ -10,6 +10,11 @@ struct BuildLogView: View {
         _manager = State(initialValue: BuildRunManager(api: api))
     }
 
+    init(action: CiBuildAction, demoMode: Bool) {
+        self.action = action
+        _manager = State(initialValue: BuildRunManager(demoMode: true))
+    }
+
     var body: some View {
         NavigationStack {
             Group {

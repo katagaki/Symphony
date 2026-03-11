@@ -487,6 +487,26 @@
         }
       }
     },
+    "Onboarding.DemoMode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try Demo Mode"
+          }
+        }
+      }
+    },
+    "Onboarding.DemoModeFooter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore the app with sample data. No API key required."
+          }
+        }
+      }
+    },
     "Onboarding.Connecting" : {
       "localizations" : {
         "en" : {

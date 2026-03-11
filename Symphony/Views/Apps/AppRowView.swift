@@ -26,11 +26,20 @@ struct AppIconView: View {
     @State private var iconURL: URL?
     @State private var didLoad = false
 
+    private var demoIconName: String? {
+        DemoData.iconNames[bundleId]
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let cornerRadius = geometry.size.width * (13.0 / 60.0)
             Group {
-                if let iconURL {
+                if let demoIconName {
+                    Image(demoIconName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .clipShape(.rect(cornerRadius: cornerRadius))
+                } else if let iconURL {
                     AsyncImage(url: iconURL) { phase in
                         switch phase {
                         case .success(let image):
@@ -59,6 +68,7 @@ struct AppIconView: View {
         }
         .aspectRatio(1, contentMode: .fit)
         .task(id: forceRefresh) {
+            if demoIconName != nil { return }
             iconURL = await AppIconCache.shared.iconURL(for: bundleId, forceRefresh: forceRefresh)
             didLoad = true
         }

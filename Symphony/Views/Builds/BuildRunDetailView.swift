@@ -126,7 +126,10 @@ struct BuildRunDetailView: View {
         .navigationTitle("Build #\(buildRun.attributes.number ?? 0)")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedAction) { action in
-            if let api = authManager.api {
+            if authManager.isDemoMode {
+                BuildLogView(action: action, demoMode: true)
+                    .interactiveDismissDisabled()
+            } else if let api = authManager.api {
                 BuildLogView(action: action, api: api)
                     .interactiveDismissDisabled()
             }
@@ -144,9 +147,14 @@ struct BuildRunDetailView: View {
             Text("Build.Detail.CancelConfirmation")
         }
         .task {
-            guard let api = authManager.api else { return }
             if manager == nil {
-                let m = BuildRunManager(api: api)
+                let m: BuildRunManager
+                if authManager.isDemoMode {
+                    m = BuildRunManager(demoMode: true)
+                } else {
+                    guard let api = authManager.api else { return }
+                    m = BuildRunManager(api: api)
+                }
                 manager = m
                 await m.loadBuildRun(id: buildRun.id)
 

@@ -89,15 +89,23 @@ struct WorkflowsView: View {
             }
         }
         .sheet(item: $selectedWorkflowForDetail) { workflow in
-            if let api = authManager.api {
+            if authManager.isDemoMode {
+                WorkflowDetailView(workflow: workflow, demoMode: true)
+                    .navigationTransition(.zoom(sourceID: "viewWorkflow-\(workflow.id)", in: namespace))
+            } else if let api = authManager.api {
                 WorkflowDetailView(workflow: workflow, api: api)
                     .navigationTransition(.zoom(sourceID: "viewWorkflow-\(workflow.id)", in: namespace))
             }
         }
         .task {
-            guard let api = authManager.api else { return }
             if manager == nil {
-                let m = WorkflowsManager(api: api, app: app)
+                let m: WorkflowsManager
+                if authManager.isDemoMode {
+                    m = WorkflowsManager(demoMode: true, app: app)
+                } else {
+                    guard let api = authManager.api else { return }
+                    m = WorkflowsManager(api: api, app: app)
+                }
                 manager = m
                 await m.loadWorkflows()
                 m.startAutoRefresh()
@@ -189,15 +197,17 @@ struct WorkflowsView: View {
                 .tint(.primary)
                 .matchedTransitionSource(id: "viewWorkflow-\(workflow.id)", in: namespace)
                 Spacer()
-                Button {
-                    selectedWorkflow = workflow
-                } label: {
-                    Text("Workflows.StartBuild")
-                        .labelIconToTitleSpacing(4)
+                if !authManager.isDemoMode {
+                    Button {
+                        selectedWorkflow = workflow
+                    } label: {
+                        Text("Workflows.StartBuild")
+                            .labelIconToTitleSpacing(4)
+                    }
+                    .controlSize(.regular)
+                    .buttonStyle(.glassProminent)
+                    .matchedTransitionSource(id: "startBuild-\(workflow.id)", in: namespace)
                 }
-                .controlSize(.regular)
-                .buttonStyle(.glassProminent)
-                .matchedTransitionSource(id: "startBuild-\(workflow.id)", in: namespace)
             }
         }
     }

@@ -14,25 +14,38 @@ final class BuildRunManager {
     var isLoadingLog: Bool = false
     var error: String?
 
-    let api: AppStoreConnectAPI
+    let api: AppStoreConnectAPI?
+    let isDemoMode: Bool
 
     init(api: AppStoreConnectAPI) {
         self.api = api
+        self.isDemoMode = false
+    }
+
+    init(demoMode: Bool) {
+        self.api = nil
+        self.isDemoMode = true
     }
 
     func loadBuildRun(id: String) async {
         isLoading = true
         error = nil
-        do {
-            buildRun = try await api.getBuildRun(id: id)
-            actions = try await api.listBuildActions(forBuildRunID: id)
-        } catch {
-            self.error = error.localizedDescription
+        if isDemoMode {
+            actions = DemoData.buildActions(forBuildRunID: id)
+        } else if let api {
+            do {
+                buildRun = try await api.getBuildRun(id: id)
+                actions = try await api.listBuildActions(forBuildRunID: id)
+            } catch {
+                self.error = error.localizedDescription
+            }
         }
         isLoading = false
     }
 
     func loadGitReferences(workflowID: String) async {
+        if isDemoMode { return }
+        guard let api else { return }
         do {
             if let repoID = try await api.getWorkflowRepositoryID(workflowID: workflowID) {
                 gitReferences = try await api.listGitReferences(forRepositoryID: repoID)
@@ -43,6 +56,8 @@ final class BuildRunManager {
     }
 
     func startBuild(workflowID: String, gitReferenceID: String) async {
+        if isDemoMode { return }
+        guard let api else { return }
         isStartingBuild = true
         error = nil
         do {
@@ -57,6 +72,8 @@ final class BuildRunManager {
     }
 
     func cancelBuildRun(id: String) async {
+        if isDemoMode { return }
+        guard let api else { return }
         do {
             try await api.cancelBuildRun(id: id)
             await loadBuildRun(id: id)
@@ -66,6 +83,8 @@ final class BuildRunManager {
     }
 
     func pollBuildStatus(id: String) async {
+        if isDemoMode { return }
+        guard let api else { return }
         while buildRun?.attributes.executionProgress != .complete {
             try? await Task.sleep(for: .seconds(10))
             if Task.isCancelled { break }
@@ -79,6 +98,8 @@ final class BuildRunManager {
     }
 
     func loadArtifacts(forActionID actionID: String) async {
+        if isDemoMode { return }
+        guard let api else { return }
         do {
             let actionArtifacts = try await api.listArtifacts(forBuildActionID: actionID)
             artifacts[actionID] = actionArtifacts
@@ -90,6 +111,15 @@ final class BuildRunManager {
     func loadLog(forActionID actionID: String) async {
         isLoadingLog = true
         logText = nil
+        if isDemoMode {
+            logText = "Logs cannot be displayed in demo mode."
+            isLoadingLog = false
+            return
+        }
+        guard let api else {
+            isLoadingLog = false
+            return
+        }
         do {
             let actionArtifacts = try await api.listArtifacts(forBuildActionID: actionID)
 

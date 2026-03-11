@@ -4,6 +4,7 @@ import Observation
 @Observable
 final class AuthenticationManager {
     var isAuthenticated: Bool = false
+    var isDemoMode: Bool = false
     var isValidating: Bool = false
     var validationError: String?
 
@@ -53,9 +54,15 @@ final class AuthenticationManager {
         isValidating = false
     }
 
+    func enterDemoMode() {
+        isDemoMode = true
+        isAuthenticated = true
+    }
+
     func signOut() {
         KeychainService.deleteAll()
         api = nil
+        isDemoMode = false
         isAuthenticated = false
         issuerID = ""
         keyID = ""

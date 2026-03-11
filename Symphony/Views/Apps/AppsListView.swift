@@ -108,9 +108,14 @@ struct AppsListView: View {
             }
         }
         .task {
-            guard let api = authManager.api else { return }
             if appsManager == nil {
-                let manager = AppsManager(api: api)
+                let manager: AppsManager
+                if authManager.isDemoMode {
+                    manager = AppsManager(demoMode: true)
+                } else {
+                    guard let api = authManager.api else { return }
+                    manager = AppsManager(api: api)
+                }
                 appsManager = manager
                 await manager.loadApps()
             }

@@ -3,10 +3,23 @@ import SwiftUI
 struct WorkflowDetailView: View {
     @Environment(\.dismiss) private var dismiss
     let workflow: CiWorkflow
-    let api: AppStoreConnectAPI
+    let api: AppStoreConnectAPI?
+    let isDemoMode: Bool
     @State private var detailedWorkflow: CiWorkflow?
     @State private var isLoading = true
     @State private var error: String?
+
+    init(workflow: CiWorkflow, api: AppStoreConnectAPI) {
+        self.workflow = workflow
+        self.api = api
+        self.isDemoMode = false
+    }
+
+    init(workflow: CiWorkflow, demoMode: Bool) {
+        self.workflow = workflow
+        self.api = nil
+        self.isDemoMode = true
+    }
 
     var body: some View {
         NavigationStack {
@@ -91,10 +104,14 @@ struct WorkflowDetailView: View {
     private func loadWorkflow() async {
         isLoading = true
         error = nil
-        do {
-            detailedWorkflow = try await api.getWorkflow(id: workflow.id)
-        } catch {
-            self.error = error.localizedDescription
+        if isDemoMode {
+            detailedWorkflow = workflow
+        } else if let api {
+            do {
+                detailedWorkflow = try await api.getWorkflow(id: workflow.id)
+            } catch {
+                self.error = error.localizedDescription
+            }
         }
         isLoading = false
     }
