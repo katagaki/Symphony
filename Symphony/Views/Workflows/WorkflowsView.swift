@@ -108,7 +108,10 @@ struct WorkflowsView: View {
             let builds = (manager.buildRunsByWorkflow[workflow.id] ?? []).sorted {
                     ($0.attributes.number ?? 0) > ($1.attributes.number ?? 0)
                 }
-            if builds.isEmpty {
+            if manager.isLoadingBuilds {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+            } else if builds.isEmpty {
                 Text("Workflows.NoBuildsYet")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
