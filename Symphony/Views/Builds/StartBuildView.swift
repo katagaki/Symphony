@@ -110,13 +110,20 @@ struct StartBuildView: View {
             .navigationTitle("Start Build")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(role: .cancel) {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             .task {
                 await manager.loadGitReferences(workflowID: workflow.id)
             }
         }
+        .presentationDetents([.medium])
     }
 }

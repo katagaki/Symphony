@@ -14,7 +14,7 @@ struct BuildStatusBadge: View {
         .font(.caption)
     }
 
-    private var labelText: String {
+    var labelText: String {
         if let progress, progress != .complete {
             switch progress {
             case .pending: return "Pending"

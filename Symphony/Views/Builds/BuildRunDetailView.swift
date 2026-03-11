@@ -13,13 +13,26 @@ struct BuildRunDetailView: View {
                     ProgressView("Loading build details...")
                 } else {
                     List {
-                        Section("Status") {
-                            LabeledContent("Progress") {
-                                BuildStatusBadge(
+                        Section {
+                            VStack(spacing: 8) {
+                                let badge = BuildStatusBadge(
                                     progress: manager.buildRun?.attributes.executionProgress,
                                     status: manager.buildRun?.attributes.completionStatus
                                 )
+                                Image(systemName: badge.iconName)
+                                    .font(.system(size: 56))
+                                    .symbolRenderingMode(.multicolor)
+                                    .foregroundStyle(badge.iconColor)
+                                Text(badge.labelText)
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
                             }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
+                        }
+                        .listRowBackground(Color.clear)
+
+                        Section {
                             if let created = manager.buildRun?.attributes.createdDate {
                                 LabeledContent("Created", value: formatDate(created))
                             }
@@ -132,4 +145,3 @@ struct BuildRunDetailView: View {
         return date.formatted(date: .abbreviated, time: .shortened)
     }
 }
-
