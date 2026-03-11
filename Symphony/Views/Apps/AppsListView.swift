@@ -69,7 +69,7 @@ struct AppsListView: View {
         }
         .navigationTitle("Apps.Title")
         .toolbar {
-            ToolbarItemGroup(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .topTrailingBar) {
                 Menu {
                     Picker("Apps.SortBy", selection: $sortOrder) {
                         ForEach(AppSortOrder.allCases, id: \.self) { order in
@@ -81,7 +81,7 @@ struct AppsListView: View {
                 }
             }
             ToolbarSpacer(.fixed)
-            ToolbarItemGroup(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .topTrailingBar) {
                 Menu {
                     Button(role: .destructive) {
                         authManager.signOut()
