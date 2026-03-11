@@ -21,7 +21,7 @@ struct BuildRunDetailView: View {
                                 )
                                 Image(systemName: badge.iconName)
                                     .font(.system(size: 56))
-                                    .symbolRenderingMode(.multicolor)
+                                    .symbolRenderingMode(.hierarchical)
                                     .foregroundStyle(badge.iconColor)
                                 Text(badge.labelText)
                                     .font(.headline)

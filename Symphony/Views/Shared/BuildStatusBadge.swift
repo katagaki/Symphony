@@ -88,6 +88,7 @@ struct BuildStatusIcon: View {
         } else {
             let badge = BuildStatusBadge(progress: progress, status: status)
             Image(systemName: badge.iconName)
+                .symbolRenderingMode(.hierarchical)
                 .foregroundStyle(badge.iconColor)
                 .imageScale(.large)
         }

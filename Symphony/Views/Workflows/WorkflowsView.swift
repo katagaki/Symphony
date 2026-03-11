@@ -38,10 +38,10 @@ struct WorkflowsView: View {
                         Section {
                             VStack(spacing: 8) {
                                 AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
-                                    .frame(width: 64, height: 64)
+                                    .frame(width: 128, height: 128)
                                 VStack(spacing: 4) {
                                     Text(app.attributes.name)
-                                        .font(.headline)
+                                        .font(.title3)
                                     Text(app.attributes.bundleId)
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
@@ -176,12 +176,14 @@ struct WorkflowsView: View {
                     selectedWorkflowForDetail = workflow
                 } label: {
                     Image(systemName: "info.circle")
+                        .imageScale(.large)
                 }
                 .matchedTransitionSource(id: "viewWorkflow-\(workflow.id)", in: namespace)
                 Button {
                     selectedWorkflow = workflow
                 } label: {
                     Image(systemName: "play.fill")
+                        .imageScale(.large)
                 }
                 .matchedTransitionSource(id: "startBuild-\(workflow.id)", in: namespace)
             }
