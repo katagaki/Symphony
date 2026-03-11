@@ -9,8 +9,7 @@ struct AppsListView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @State private var appsManager: AppsManager?
     @State private var sortOrder: AppSortOrder = .name
-    @State private var showMore = false
-    @Namespace private var moreTransition
+    @Environment(\.openURL) private var openURL
 
     private var sortedApps: [CiApp] {
         guard let apps = appsManager?.apps else { return [] }
@@ -49,6 +48,7 @@ struct AppsListView: View {
                             AppRowView(app: app)
                         }
                     }
+                    .listStyle(.plain)
                     .refreshable {
                         await manager.loadApps()
                     }
@@ -59,15 +59,7 @@ struct AppsListView: View {
         }
         .navigationTitle("Apps")
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showMore = true
-                } label: {
-                    Image(systemName: "ellipsis")
-                }
-                .matchedTransitionSource(id: "more", in: moreTransition)
-            }
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
                 Menu {
                     Picker("Sort By", selection: $sortOrder) {
                         ForEach(AppSortOrder.allCases, id: \.self) { order in
@@ -78,10 +70,28 @@ struct AppsListView: View {
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
-        }
-        .sheet(isPresented: $showMore) {
-            MoreView()
-                .navigationTransition(.zoom(sourceID: "more", in: moreTransition))
+            ToolbarItem(placement: .primaryAction) {
+                Spacer()
+            }
+            ToolbarItemGroup(placement: .primaryAction) {
+                Menu {
+                    Button(role: .destructive) {
+                        authManager.signOut()
+                    } label: {
+                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                    }
+                    Divider()
+                    Button {
+                        openURL(URL(string: "https://github.com/katagaki/Symphony")!)
+                    } label: {
+                        LabeledContent("Source Code") {
+                            Text("katagaki/Symphony")
+                        }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+            }
         }
         .task {
             guard let api = authManager.api else { return }

@@ -33,7 +33,7 @@ struct BuildStatusBadge: View {
         }
     }
 
-    private var iconName: String {
+    var iconName: String {
         if let progress, progress != .complete {
             switch progress {
             case .pending: return "clock.fill"
@@ -52,7 +52,7 @@ struct BuildStatusBadge: View {
         }
     }
 
-    private var iconColor: Color {
+    var iconColor: Color {
         if let progress, progress != .complete {
             switch progress {
             case .pending: return .orange
@@ -68,6 +68,28 @@ struct BuildStatusBadge: View {
         case .errored: return .red
         case .canceled: return .secondary
         case .skipped: return .secondary
+        }
+    }
+}
+
+struct BuildStatusIcon: View {
+    let progress: ExecutionProgress?
+    let status: CompletionStatus?
+
+    private var isInProgress: Bool {
+        guard let progress else { return false }
+        return progress == .pending || progress == .running
+    }
+
+    var body: some View {
+        if isInProgress {
+            ProgressView()
+                .controlSize(.regular)
+        } else {
+            let badge = BuildStatusBadge(progress: progress, status: status)
+            Image(systemName: badge.iconName)
+                .foregroundStyle(badge.iconColor)
+                .imageScale(.large)
         }
     }
 }
