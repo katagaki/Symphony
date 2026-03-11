@@ -30,6 +30,21 @@ struct WorkflowsView: View {
                     )
                 } else {
                     List {
+                        Section {
+                            HStack(spacing: 12) {
+                                AppIconView(bundleId: app.attributes.bundleId)
+                                    .frame(width: 64, height: 64)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(app.attributes.name)
+                                        .font(.headline)
+                                    Text(app.attributes.bundleId)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .padding(.vertical, 2)
+                            .listRowBackground(Color.clear)
+                        }
                         ForEach(manager.workflows) { workflow in
                             workflowSection(workflow: workflow, manager: manager)
                         }
@@ -51,16 +66,6 @@ struct WorkflowsView: View {
         }
         .navigationTitle(app.attributes.name)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 4) {
-                    AppIconView(bundleId: app.attributes.bundleId)
-                        .frame(width: 30, height: 30)
-                    Text(app.attributes.name)
-                        .font(.subheadline)
-                }
-            }
-        }
         .sheet(isPresented: $showStartBuild) {
             if let workflow = selectedWorkflow, let api = authManager.api {
                 StartBuildView(workflow: workflow, api: api)
@@ -101,6 +106,11 @@ struct WorkflowsView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Build #\(buildRun.attributes.number ?? 0)")
                                     .font(.headline)
+                                if let branchName = manager.branchNamesByBuildRun[buildRun.id] {
+                                    Label(branchName, systemImage: "arrow.triangle.branch")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                                 if let commit = buildRun.attributes.sourceCommit,
                                    let message = commit.message {
                                     Text(message)

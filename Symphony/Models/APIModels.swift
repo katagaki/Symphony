@@ -19,6 +19,23 @@ nonisolated struct APIPaginationLinks: Decodable, Sendable {
     let next: String?
 }
 
+nonisolated struct APIListResponseWithIncludes<T: Decodable & Sendable, I: Decodable & Sendable>: Decodable, Sendable {
+    let data: [T]
+    let included: [I]
+    let links: APIPaginationLinks?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        data = try container.decode([T].self, forKey: .data)
+        included = (try? container.decode([I].self, forKey: .included)) ?? []
+        links = try? container.decode(APIPaginationLinks.self, forKey: .links)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case data, included, links
+    }
+}
+
 nonisolated struct APIResourceIdentifier: Codable, Sendable, Hashable {
     let type: String
     let id: String
