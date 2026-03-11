@@ -83,20 +83,19 @@ struct BuildRunDetailView: View {
                                             VStack(alignment: .leading, spacing: 4) {
                                                 Text(action.attributes.name ?? action.attributes.actionType ?? String(localized: "Build.Actions.Action"))
                                                     .font(.headline)
-                                                    .foregroundStyle(.primary)
                                                 if let issues = action.attributes.issueCounts {
                                                     HStack(spacing: 12) {
                                                         if let errors = issues.errors, errors > 0 {
                                                             Label("\(errors)", systemImage: "xmark.circle.fill")
-                                                                .foregroundStyle(.red)
+                                                                .symbolRenderingMode(.multicolor)
                                                         }
                                                         if let warnings = issues.warnings, warnings > 0 {
                                                             Label("\(warnings)", systemImage: "exclamationmark.triangle.fill")
-                                                                .foregroundStyle(.orange)
+                                                                .symbolRenderingMode(.multicolor)
                                                         }
                                                         if let failures = issues.testFailures, failures > 0 {
                                                             Label("\(failures)", systemImage: "xmark.diamond.fill")
-                                                                .foregroundStyle(.red)
+                                                                .symbolRenderingMode(.multicolor)
                                                         }
                                                     }
                                                     .font(.caption)
@@ -109,6 +108,7 @@ struct BuildRunDetailView: View {
                                             )
                                         }
                                     }
+                                    .tint(.primary)
                                 }
                             }
                         }
