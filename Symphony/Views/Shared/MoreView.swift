@@ -31,7 +31,7 @@ struct MoreView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
+                    Button(role: .close) {
                         dismiss()
                     }
                 }
