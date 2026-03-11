@@ -106,6 +106,11 @@ struct WorkflowsView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Build #\(buildRun.attributes.number ?? 0)")
                                     .font(.headline)
+                                if let branchName = manager.branchNamesByBuildRun[buildRun.id] {
+                                    Label(branchName, systemImage: "arrow.triangle.branch")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                                 if let commit = buildRun.attributes.sourceCommit,
                                    let message = commit.message {
                                     Text(message)

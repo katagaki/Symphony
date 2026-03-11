@@ -5,6 +5,7 @@ import Observation
 final class WorkflowsManager {
     var workflows: [CiWorkflow] = []
     var buildRunsByWorkflow: [String: [CiBuildRun]] = [:]
+    var branchNamesByBuildRun: [String: String] = [:]
     var isLoading: Bool = false
     var isRefreshing: Bool = false
     var error: String?
@@ -46,18 +47,21 @@ final class WorkflowsManager {
 
     private func loadBuildRunsPerWorkflow() async {
         var grouped: [String: [CiBuildRun]] = [:]
-        await withTaskGroup(of: (String, [CiBuildRun]).self) { group in
+        var allBranchNames: [String: String] = [:]
+        await withTaskGroup(of: (String, [CiBuildRun], [String: String]).self) { group in
             for workflow in workflows {
                 group.addTask {
-                    let runs = (try? await self.api.listBuildRuns(forWorkflowID: workflow.id)) ?? []
-                    return (workflow.id, runs)
+                    let result = try? await self.api.listBuildRuns(forWorkflowID: workflow.id)
+                    return (workflow.id, result?.runs ?? [], result?.branchNames ?? [:])
                 }
             }
-            for await (workflowID, runs) in group {
+            for await (workflowID, runs, branchNames) in group {
                 grouped[workflowID] = runs
+                allBranchNames.merge(branchNames) { _, new in new }
             }
         }
         buildRunsByWorkflow = grouped
+        branchNamesByBuildRun = allBranchNames
     }
 
     func cancelBuildRun(id: String) async {

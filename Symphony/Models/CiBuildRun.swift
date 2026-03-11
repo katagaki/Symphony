@@ -35,9 +35,10 @@ nonisolated struct CiBuildRun: Decodable, Identifiable, Sendable, Hashable {
     }
 
     nonisolated struct Relationships: Decodable, Sendable {
-        let workflow: WorkflowRelationship?
+        let workflow: ResourceRelationship?
+        let sourceBranchOrTag: ResourceRelationship?
 
-        nonisolated struct WorkflowRelationship: Decodable, Sendable {
+        nonisolated struct ResourceRelationship: Decodable, Sendable {
             let data: APIResourceIdentifier?
         }
     }
