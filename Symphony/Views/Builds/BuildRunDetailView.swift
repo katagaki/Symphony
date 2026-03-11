@@ -46,6 +46,7 @@ struct BuildRunDetailView: View {
                                     Text("Build.Detail.CancelBuild")
                                         .frame(maxWidth: .infinity)
                                 }
+                                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                             }
                             if let started = manager.buildRun?.attributes.startedDate {
                                 LabeledContent("Build.Detail.Started", value: formatDate(started))
