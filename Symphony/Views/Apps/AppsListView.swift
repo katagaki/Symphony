@@ -16,6 +16,7 @@ struct AppsListView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @State private var appsManager: AppsManager?
     @State private var sortOrder: AppSortOrder = .name
+    @State private var forceRefreshIcons = false
     @Environment(\.openURL) private var openURL
 
     private var sortedApps: [CiApp] {
@@ -52,12 +53,14 @@ struct AppsListView: View {
                 } else {
                     List(sortedApps) { app in
                         NavigationLink(value: app) {
-                            AppRowView(app: app)
+                            AppRowView(app: app, forceRefreshIcons: forceRefreshIcons)
                         }
                     }
                     .listStyle(.plain)
                     .refreshable {
+                        forceRefreshIcons = true
                         await manager.loadApps()
+                        forceRefreshIcons = false
                     }
                 }
             } else {

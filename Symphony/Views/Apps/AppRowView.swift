@@ -2,10 +2,11 @@ import SwiftUI
 
 struct AppRowView: View {
     let app: CiApp
+    var forceRefreshIcons: Bool = false
 
     var body: some View {
         HStack(spacing: 12) {
-            AppIconView(bundleId: app.attributes.bundleId)
+            AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
                 .frame(width: 64, height: 64)
             VStack(alignment: .leading, spacing: 4) {
                 Text(app.attributes.name)
@@ -21,6 +22,7 @@ struct AppRowView: View {
 
 struct AppIconView: View {
     let bundleId: String
+    var forceRefresh: Bool = false
     @State private var iconURL: URL?
     @State private var didLoad = false
 
@@ -46,8 +48,8 @@ struct AppIconView: View {
                 ProgressView()
             }
         }
-        .task {
-            iconURL = await Self.fetchIconURL(bundleId: bundleId)
+        .task(id: forceRefresh) {
+            iconURL = await AppIconCache.shared.iconURL(for: bundleId, forceRefresh: forceRefresh)
             didLoad = true
         }
     }
@@ -56,24 +58,5 @@ struct AppIconView: View {
         RoundedRectangle(cornerRadius: 14, style: .continuous)
             .fill(.clear)
             .glassEffect(.regular, in: .rect(cornerRadius: 14, style: .continuous))
-    }
-
-    private static func fetchIconURL(bundleId: String) async -> URL? {
-        guard let lookupURL = URL(
-            string: "https://itunes.apple.com/lookup?bundleId=\(bundleId)"
-        ) else { return nil }
-
-        do {
-            let (data, _) = try await URLSession.shared.data(from: lookupURL)
-            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-            let results = json?["results"] as? [[String: Any]]
-            if let artworkString = results?.first?["artworkUrl512"] as? String,
-               let url = URL(string: artworkString) {
-                return url
-            }
-        } catch {
-            // Fall through to return nil
-        }
-        return nil
     }
 }
