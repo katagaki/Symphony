@@ -30,7 +30,7 @@ final class WorkflowsManager {
             let product = try await api.getCiProduct(forAppID: app.id)
             productID = product.id
             workflows = try await api.listWorkflows(forProductID: product.id)
-            try await loadBuildRuns(productID: product.id)
+            await loadBuildRunsPerWorkflow()
         } catch {
             self.error = error.localizedDescription
         }
@@ -38,27 +38,23 @@ final class WorkflowsManager {
     }
 
     func refreshBuildRuns() async {
-        guard let productID else { return }
+        guard productID != nil else { return }
         isRefreshing = true
-        do {
-            try await loadBuildRuns(productID: productID)
-        } catch {
-            // Silently fail on background refresh
-        }
+        await loadBuildRunsPerWorkflow()
         isRefreshing = false
     }
 
-    private func loadBuildRuns(productID: String) async throws {
-        let buildRuns = try await api.listBuildRuns(forProductID: productID)
-
+    private func loadBuildRunsPerWorkflow() async {
         var grouped: [String: [CiBuildRun]] = [:]
-        for run in buildRuns {
-            if let wfID = run.relationships?.workflow?.data?.id {
-                var runs = grouped[wfID] ?? []
-                if runs.count < 5 {
-                    runs.append(run)
+        await withTaskGroup(of: (String, [CiBuildRun]).self) { group in
+            for workflow in workflows {
+                group.addTask {
+                    let runs = (try? await self.api.listBuildRuns(forWorkflowID: workflow.id)) ?? []
+                    return (workflow.id, runs)
                 }
-                grouped[wfID] = runs
+            }
+            for await (workflowID, runs) in group {
+                grouped[workflowID] = runs
             }
         }
         buildRunsByWorkflow = grouped
