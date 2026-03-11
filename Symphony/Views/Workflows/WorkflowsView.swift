@@ -174,18 +174,18 @@ struct WorkflowsView: View {
         } header: {
             HStack {
                 Text(workflow.attributes.name)
-                Spacer()
                 Button {
                     selectedWorkflowForDetail = workflow
                 } label: {
                     Image(systemName: "info.circle")
-                        .imageScale(.large)
+                        .foregroundStyle(.secondary)
                 }
                 .matchedTransitionSource(id: "viewWorkflow-\(workflow.id)", in: namespace)
+                Spacer()
                 Button {
                     selectedWorkflow = workflow
                 } label: {
-                    Image(systemName: "play.fill")
+                    Label("Workflows.StartBuild", systemImage: "play.fill")
                         .imageScale(.large)
                 }
                 .matchedTransitionSource(id: "startBuild-\(workflow.id)", in: namespace)

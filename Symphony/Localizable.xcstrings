@@ -771,6 +771,16 @@
         }
       }
     },
+    "Workflows.StartBuild" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Build"
+          }
+        }
+      }
+    },
     "Workflows.ShowMore %lld" : {
       "localizations" : {
         "en" : {
