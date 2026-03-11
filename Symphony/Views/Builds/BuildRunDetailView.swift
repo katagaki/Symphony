@@ -5,6 +5,7 @@ struct BuildRunDetailView: View {
     let buildRun: CiBuildRun
     @State private var manager: BuildRunManager?
     @State private var selectedAction: CiBuildAction?
+    @State private var showCancelConfirmation = false
 
     var body: some View {
         Group {
@@ -40,11 +41,7 @@ struct BuildRunDetailView: View {
                             if manager.buildRun?.attributes.executionProgress == .pending
                                 || manager.buildRun?.attributes.executionProgress == .running {
                                 Button(role: .destructive) {
-                                    Task {
-                                        if let id = manager.buildRun?.id {
-                                            await manager.cancelBuildRun(id: id)
-                                        }
-                                    }
+                                    showCancelConfirmation = true
                                 } label: {
                                     Label("Build.Detail.CancelBuild", systemImage: "xmark.circle.fill")
                                         .frame(maxWidth: .infinity)
@@ -132,6 +129,18 @@ struct BuildRunDetailView: View {
                 BuildLogView(action: action, api: api)
                     .interactiveDismissDisabled()
             }
+        }
+        .alert("Build.Detail.CancelBuild", isPresented: $showCancelConfirmation) {
+            Button("Build.Detail.CancelBuild", role: .destructive) {
+                Task {
+                    if let id = manager?.buildRun?.id {
+                        await manager?.cancelBuildRun(id: id)
+                    }
+                }
+            }
+            Button("Shared.Cancel", role: .cancel) {}
+        } message: {
+            Text("Build.Detail.CancelConfirmation")
         }
         .task {
             guard let api = authManager.api else { return }

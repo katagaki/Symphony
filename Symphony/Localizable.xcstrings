@@ -141,6 +141,16 @@
         }
       }
     },
+    "Build.Detail.CancelConfirmation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are you sure you want to cancel this build?"
+          }
+        }
+      }
+    },
     "Build.Detail.Finished" : {
       "localizations" : {
         "en" : {
