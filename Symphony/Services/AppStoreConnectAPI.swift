@@ -59,10 +59,11 @@ actor AppStoreConnectAPI {
         return response.data
     }
 
-    func listBuildRuns(forWorkflowID workflowID: String, limit: Int = 5) async throws -> [CiBuildRun] {
+    func listBuildRuns(forWorkflowID workflowID: String, limit: Int = 25) async throws -> [CiBuildRun] {
         let response: APIListResponse<CiBuildRun> = try await client.get(
             path: "/v1/ciWorkflows/\(workflowID)/buildRuns",
-            queryItems: [URLQueryItem(name: "limit", value: "\(limit)")]
+            queryItems: [URLQueryItem(name: "limit", value: "\(limit)"),
+                         URLQueryItem(name: "sort", value: "-number")]
         )
         return response.data
     }
