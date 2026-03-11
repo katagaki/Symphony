@@ -115,61 +115,57 @@ final class BuildRunManager {
 
     private static func decompressGzip(data: Data) -> Data? {
         // Check for gzip magic number
-        guard data.count >= 2, data[data.startIndex] == 0x1f, data[data.startIndex + 1] == 0x8b else {
+        guard data.count >= 10, data[data.startIndex] == 0x1f, data[data.startIndex + 1] == 0x8b else {
             return nil
         }
 
         let bufferSize = 65536
+        let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer { destinationBuffer.deallocate() }
+
+        var stream = compression_stream()
+        let initStatus = compression_stream_init(&stream, COMPRESSION_STREAM_DECODE, COMPRESSION_ZLIB)
+        guard initStatus == COMPRESSION_STATUS_OK else { return nil }
+        defer { compression_stream_destroy(&stream) }
+
+        // Skip gzip header (minimum 10 bytes)
+        let headerSize = 10
+        let sourceData = data.dropFirst(headerSize)
+        let sourceArray = Array(sourceData)
+
         var decompressed = Data()
 
-        let result: Data? = data.withUnsafeBytes { rawBuffer -> Data? in
-            guard let sourcePointer = rawBuffer.baseAddress?.assumingMemoryBound(to: UInt8.self) else {
-                return nil
-            }
+        sourceArray.withUnsafeBufferPointer { sourceBuffer in
+            guard let sourcePointer = sourceBuffer.baseAddress else { return }
 
-            let destinationBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-            defer { destinationBuffer.deallocate() }
-
-            let stream = compression_stream_init(COMPRESSION_STREAM_DECODE, COMPRESSION_ZLIB)
-            guard stream == COMPRESSION_STATUS_OK else { return nil }
-
-            var compressionStream = compression_stream()
-            let initStatus = compression_stream_init(&compressionStream, COMPRESSION_STREAM_DECODE, COMPRESSION_ZLIB)
-            guard initStatus == COMPRESSION_STATUS_OK else { return nil }
-            defer { compression_stream_destroy(&compressionStream) }
-
-            // Skip gzip header (minimum 10 bytes)
-            let headerSize = 10
-            guard data.count > headerSize else { return nil }
-
-            compressionStream.src_ptr = sourcePointer.advanced(by: headerSize)
-            compressionStream.src_size = data.count - headerSize
-            compressionStream.dst_ptr = destinationBuffer
-            compressionStream.dst_size = bufferSize
+            stream.src_ptr = sourcePointer
+            stream.src_size = sourceBuffer.count
+            stream.dst_ptr = destinationBuffer
+            stream.dst_size = bufferSize
 
             while true {
-                let status = compression_stream_process(&compressionStream, 0)
+                let status = compression_stream_process(&stream, 0)
 
                 switch status {
                 case COMPRESSION_STATUS_OK:
-                    let outputSize = bufferSize - compressionStream.dst_size
+                    let outputSize = bufferSize - stream.dst_size
                     if outputSize > 0 {
                         decompressed.append(destinationBuffer, count: outputSize)
                     }
-                    compressionStream.dst_ptr = destinationBuffer
-                    compressionStream.dst_size = bufferSize
+                    stream.dst_ptr = destinationBuffer
+                    stream.dst_size = bufferSize
                 case COMPRESSION_STATUS_END:
-                    let outputSize = bufferSize - compressionStream.dst_size
+                    let outputSize = bufferSize - stream.dst_size
                     if outputSize > 0 {
                         decompressed.append(destinationBuffer, count: outputSize)
                     }
-                    return decompressed
+                    return
                 default:
-                    return nil
+                    return
                 }
             }
         }
 
-        return result
+        return decompressed.isEmpty ? nil : decompressed
     }
 }
