@@ -38,16 +38,17 @@ struct BuildRunDetailView: View {
                             if let created = manager.buildRun?.attributes.createdDate {
                                 LabeledContent("Build.Detail.Created", value: formatDate(created))
                             }
-                            if manager.buildRun?.attributes.executionProgress == .pending
-                                || manager.buildRun?.attributes.executionProgress == .running {
-                                Button(role: .destructive) {
-                                    showCancelConfirmation = true
-                                } label: {
-                                    Text("Build.Detail.CancelBuild")
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-                            }
+                            // TODO: No API to run this, will need to wait for an official API
+//                            if manager.buildRun?.attributes.executionProgress == .pending
+//                                || manager.buildRun?.attributes.executionProgress == .running {
+//                                Button(role: .destructive) {
+//                                    showCancelConfirmation = true
+//                                } label: {
+//                                    Text("Build.Detail.CancelBuild")
+//                                        .frame(maxWidth: .infinity)
+//                                }
+//                                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+//                            }
                             if let started = manager.buildRun?.attributes.startedDate {
                                 LabeledContent("Build.Detail.Started", value: formatDate(started))
                             }
