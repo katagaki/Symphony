@@ -11,22 +11,22 @@ struct WorkflowsView: View {
         Group {
             if let manager {
                 if manager.isLoading && manager.workflows.isEmpty {
-                    ProgressView("Loading workflows...")
+                    ProgressView("Workflows.Loading")
                 } else if let error = manager.error, manager.workflows.isEmpty {
                     ContentUnavailableView {
-                        Label("Failed to Load", systemImage: "exclamationmark.triangle")
+                        Label("Workflows.FailedToLoad", systemImage: "exclamationmark.triangle")
                     } description: {
                         Text(error)
                     } actions: {
-                        Button("Retry") {
+                        Button("Shared.Retry") {
                             Task { await manager.loadWorkflows() }
                         }
                     }
                 } else if manager.workflows.isEmpty {
                     ContentUnavailableView(
-                        "No Workflows",
+                        "Workflows.NoWorkflows",
                         systemImage: "hammer.fill",
-                        description: Text("No Xcode Cloud workflows found for this app.")
+                        description: Text("Workflows.NoWorkflowsDescription")
                     )
                 } else {
                     List {
@@ -92,7 +92,7 @@ struct WorkflowsView: View {
                     ($0.attributes.number ?? 0) > ($1.attributes.number ?? 0)
                 }
             if builds.isEmpty {
-                Text("No builds yet")
+                Text("Workflows.NoBuildsYet")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
@@ -132,7 +132,7 @@ struct WorkflowsView: View {
                                     await manager.cancelBuildRun(id: buildRun.id)
                                 }
                             } label: {
-                                Label("Cancel", systemImage: "xmark.circle")
+                                Label("Shared.Cancel", systemImage: "xmark.circle")
                             }
                         }
                     }
@@ -148,7 +148,7 @@ struct WorkflowsView: View {
                 } label: {
                     HStack(spacing: 2) {
                         Image(systemName: "play.fill")
-                        Text("Start Build")
+                        Text("Build.Start.Title")
                     }
                     .font(.caption)
                 }

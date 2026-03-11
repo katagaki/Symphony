@@ -12,13 +12,13 @@ struct MoreView: View {
                         dismiss()
                         authManager.signOut()
                     } label: {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        Label("Shared.SignOut", systemImage: "rectangle.portrait.and.arrow.right")
                     }
                 }
                 Section {
                     Link(destination: URL(string: "https://github.com/katagaki/Symphony")!) {
                         HStack {
-                            Text("Source Code")
+                            Text("Shared.SourceCode")
                             Spacer()
                             Text("katagaki/Symphony")
                                 .font(.subheadline)
@@ -27,7 +27,7 @@ struct MoreView: View {
                     }
                 }
             }
-            .navigationTitle("More")
+            .navigationTitle("More.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

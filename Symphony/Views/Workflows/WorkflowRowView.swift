@@ -14,7 +14,7 @@ struct WorkflowRowView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 } else {
-                    Text("No builds yet")
+                    Text("Workflows.NoBuildsYet")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

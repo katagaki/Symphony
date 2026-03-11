@@ -16,7 +16,7 @@ struct BuildLogView: View {
                 if manager.isLoadingLog {
                     VStack(spacing: 16) {
                         ProgressView()
-                        Text("Loading logs...")
+                        Text("Build.Log.Loading")
                             .foregroundStyle(.secondary)
                     }
                 } else if let logText = manager.logText {
@@ -29,17 +29,17 @@ struct BuildLogView: View {
                     }
                 } else {
                     ContentUnavailableView(
-                        "No Logs",
+                        "Build.Log.NoLogs",
                         systemImage: "doc.text",
-                        description: Text("No log content available for this action.")
+                        description: Text("Build.Log.NoLogsDescription")
                     )
                 }
             }
-            .navigationTitle(action.attributes.name ?? "Logs")
+            .navigationTitle(action.attributes.name ?? String(localized: "Build.Log.Title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Shared.Done") { dismiss() }
                 }
             }
             .task {

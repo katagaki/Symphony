@@ -17,19 +17,19 @@ struct BuildStatusBadge: View {
     var labelText: String {
         if let progress, progress != .complete {
             switch progress {
-            case .pending: return "Pending"
-            case .running: return "Running"
-            case .complete: return "Complete"
+            case .pending: return String(localized: "Build.Status.Pending")
+            case .running: return String(localized: "Build.Status.Running")
+            case .complete: return String(localized: "Build.Status.Complete")
             }
         }
 
-        guard let status else { return "Unknown" }
+        guard let status else { return String(localized: "Build.Status.Unknown") }
         switch status {
-        case .succeeded: return "Succeeded"
-        case .failed: return "Failed"
-        case .errored: return "Errored"
-        case .canceled: return "Canceled"
-        case .skipped: return "Skipped"
+        case .succeeded: return String(localized: "Build.Status.Succeeded")
+        case .failed: return String(localized: "Build.Status.Failed")
+        case .errored: return String(localized: "Build.Status.Errored")
+        case .canceled: return String(localized: "Build.Status.Canceled")
+        case .skipped: return String(localized: "Build.Status.Skipped")
         }
     }
 

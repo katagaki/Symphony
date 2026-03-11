@@ -15,10 +15,10 @@ struct OnboardingView: View {
                         Image(systemName: "cloud.fill")
                             .font(.system(size: 48))
                             .foregroundStyle(.tint)
-                        Text("Welcome to Symphony")
+                        Text("Onboarding.Welcome")
                             .font(.title2)
                             .fontWeight(.bold)
-                        Text("Connect your App Store Connect account to manage Xcode Cloud builds.")
+                        Text("Onboarding.Description")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
@@ -29,18 +29,18 @@ struct OnboardingView: View {
                 }
 
                 Section {
-                    TextField("Issuer ID", text: $auth.issuerID)
+                    TextField("Onboarding.IssuerID", text: $auth.issuerID)
                         .textContentType(.none)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
-                    TextField("Key ID", text: $auth.keyID)
+                    TextField("Onboarding.KeyID", text: $auth.keyID)
                         .textContentType(.none)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                 } header: {
-                    Text("API Key Information")
+                    Text("Onboarding.APIKeyInfo")
                 } footer: {
-                    Text("Find these values in App Store Connect under Users and Access > Integrations > App Store Connect API.")
+                    Text("Onboarding.APIKeyInfoFooter")
                 }
 
                 Section {
@@ -53,12 +53,12 @@ struct OnboardingView: View {
                     Button {
                         showFilePicker = true
                     } label: {
-                        Label("Import from File", systemImage: "doc.fill")
+                        Label("Onboarding.ImportFromFile", systemImage: "doc.fill")
                     }
                 } header: {
-                    Text("Private Key (.p8)")
+                    Text("Onboarding.PrivateKey")
                 } footer: {
-                    Text("Paste the contents of your .p8 file or import it directly.")
+                    Text("Onboarding.PrivateKeyFooter")
                 }
 
                 if let error = authManager.validationError {
@@ -79,9 +79,9 @@ struct OnboardingView: View {
                             if authManager.isValidating {
                                 ProgressView()
                                     .padding(.trailing, 8)
-                                Text("Connecting...")
+                                Text("Onboarding.Connecting")
                             } else {
-                                Text("Connect")
+                                Text("Onboarding.Connect")
                             }
                             Spacer()
                         }
@@ -89,7 +89,7 @@ struct OnboardingView: View {
                     .disabled(!authManager.canConnect || authManager.isValidating)
                 }
             }
-            .navigationTitle("Setup")
+            .navigationTitle("Onboarding.Title")
             .fileImporter(
                 isPresented: $showFilePicker,
                 allowedContentTypes: [

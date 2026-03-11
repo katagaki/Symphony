@@ -16,20 +16,20 @@ struct StartBuildView: View {
         NavigationStack {
             Form {
                 Section {
-                    LabeledContent("Workflow", value: workflow.attributes.name)
+                    LabeledContent("Build.Start.Workflow", value: workflow.attributes.name)
                 }
 
-                Section("Branch or Tag") {
+                Section("Build.Start.BranchOrTag") {
                     if manager.gitReferences.isEmpty && manager.error == nil {
                         HStack {
                             ProgressView()
                                 .padding(.trailing, 8)
-                            Text("Loading git references...")
+                            Text("Build.Start.LoadingRefs")
                                 .foregroundStyle(.secondary)
                         }
                     } else {
-                        Picker("Select Reference", selection: $selectedRefID) {
-                            Text("Select a branch or tag...")
+                        Picker("Build.Start.SelectReference", selection: $selectedRefID) {
+                            Text("Build.Start.SelectPlaceholder")
                                 .tag(String?.none)
 
                             let branches = manager.gitReferences.filter {
@@ -40,7 +40,7 @@ struct StartBuildView: View {
                             }
 
                             if !branches.isEmpty {
-                                Section("Branches") {
+                                Section("Build.Start.Branches") {
                                     ForEach(branches) { ref in
                                         Label(ref.attributes.name, systemImage: "arrow.triangle.branch")
                                             .tag(Optional(ref.id))
@@ -49,7 +49,7 @@ struct StartBuildView: View {
                             }
 
                             if !tags.isEmpty {
-                                Section("Tags") {
+                                Section("Build.Start.Tags") {
                                     ForEach(tags) { ref in
                                         Label(ref.attributes.name, systemImage: "tag")
                                             .tag(Optional(ref.id))
@@ -69,7 +69,7 @@ struct StartBuildView: View {
 
                 if didStartBuild {
                     Section {
-                        Label("Build started successfully!", systemImage: "checkmark.circle.fill")
+                        Label("Build.Start.Success", systemImage: "checkmark.circle.fill")
                             .foregroundStyle(.green)
                     }
                 }
@@ -94,11 +94,11 @@ struct StartBuildView: View {
                             if manager.isStartingBuild {
                                 ProgressView()
                                     .padding(.trailing, 8)
-                                Text("Starting Build...")
+                                Text("Build.Start.Starting")
                             } else {
                                 HStack(spacing: 4) {
                                     Image(systemName: "play.fill")
-                                    Text("Start Build")
+                                    Text("Build.Start.Title")
                                 }
                             }
                             Spacer()
@@ -107,7 +107,7 @@ struct StartBuildView: View {
                     .disabled(selectedRefID == nil || manager.isStartingBuild || didStartBuild)
                 }
             }
-            .navigationTitle("Start Build")
+            .navigationTitle("Build.Start.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
