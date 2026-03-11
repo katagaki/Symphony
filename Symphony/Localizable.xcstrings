@@ -1,161 +1,645 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "%lld" : {
-
+    "Apps.FailedToLoad" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to Load"
+          }
+        }
+      }
     },
-    "Actions" : {
-
+    "Apps.Loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading apps…"
+          }
+        }
+      }
     },
-    "API Key Information" : {
-
+    "Apps.NoApps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Apps"
+          }
+        }
+      }
     },
-    "Apps" : {
-
+    "Apps.NoAppsDescription" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No apps found in your App Store Connect account."
+          }
+        }
+      }
     },
-    "Author" : {
-
+    "Apps.Sort.BundleID" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bundle ID"
+          }
+        }
+      }
     },
-    "Branch or Tag" : {
-
+    "Apps.Sort.Name" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
+      }
     },
-    "Branches" : {
-
+    "Apps.SortBy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort By"
+          }
+        }
+      }
+    },
+    "Apps.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apps"
+          }
+        }
+      }
     },
     "Build #%lld" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build #%lld"
+          }
+        }
+      }
     },
-    "Build started successfully!" : {
-
+    "Build.Actions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions"
+          }
+        }
+      }
     },
-    "Cancel" : {
-
+    "Build.Actions.Action" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Action"
+          }
+        }
+      }
     },
-    "Commit" : {
-
+    "Build.Detail.Created" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created"
+          }
+        }
+      }
     },
-    "Connect" : {
-
+    "Build.Detail.Finished" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished"
+          }
+        }
+      }
     },
-    "Connect your App Store Connect account to manage Xcode Cloud builds." : {
-
+    "Build.Detail.Loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading build details…"
+          }
+        }
+      }
     },
-    "Connecting..." : {
-
+    "Build.Detail.Started" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Started"
+          }
+        }
+      }
     },
-    "Created" : {
-
+    "Build.Log.Loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading logs…"
+          }
+        }
+      }
     },
-    "Done" : {
-
+    "Build.Log.NoLogs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Logs"
+          }
+        }
+      }
     },
-    "Failed to Load" : {
-
+    "Build.Log.NoLogsDescription" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No log content available for this action."
+          }
+        }
+      }
     },
-    "Find these values in App Store Connect under Users and Access > Integrations > App Store Connect API." : {
-
+    "Build.Log.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logs"
+          }
+        }
+      }
     },
-    "Finished" : {
-
+    "Build.Source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source"
+          }
+        }
+      }
     },
-    "Import from File" : {
-
+    "Build.Source.Author" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Author"
+          }
+        }
+      }
     },
-    "Issuer ID" : {
-
+    "Build.Source.Commit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commit"
+          }
+        }
+      }
     },
-    "Key ID" : {
-
+    "Build.Start.BranchOrTag" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Branch or Tag"
+          }
+        }
+      }
     },
-    "Loading apps..." : {
-
+    "Build.Start.Branches" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Branches"
+          }
+        }
+      }
     },
-    "Loading build details..." : {
-
+    "Build.Start.LoadingRefs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading git references…"
+          }
+        }
+      }
     },
-    "Loading git references..." : {
-
+    "Build.Start.SelectPlaceholder" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a branch or tag…"
+          }
+        }
+      }
     },
-    "Loading logs..." : {
-
+    "Build.Start.SelectReference" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Reference"
+          }
+        }
+      }
     },
-    "Loading workflows..." : {
-
+    "Build.Start.Starting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting Build…"
+          }
+        }
+      }
     },
-    "No Apps" : {
-
+    "Build.Start.Success" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Build started successfully!"
+          }
+        }
+      }
     },
-    "No apps found in your App Store Connect account." : {
-
+    "Build.Start.Tags" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        }
+      }
     },
-    "No builds yet" : {
-
+    "Build.Start.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Build"
+          }
+        }
+      }
     },
-    "No log content available for this action." : {
-
+    "Build.Start.Workflow" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Workflow"
+          }
+        }
+      }
     },
-    "No Logs" : {
-
+    "Build.Status.Canceled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Canceled"
+          }
+        }
+      }
     },
-    "No Workflows" : {
-
+    "Build.Status.Complete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete"
+          }
+        }
+      }
     },
-    "No Xcode Cloud workflows found for this app." : {
-
+    "Build.Status.Errored" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errored"
+          }
+        }
+      }
     },
-    "Paste the contents of your .p8 file or import it directly." : {
-
+    "Build.Status.Failed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        }
+      }
     },
-    "Private Key (.p8)" : {
-
+    "Build.Status.Pending" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pending"
+          }
+        }
+      }
     },
-    "Progress" : {
-
+    "Build.Status.Running" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running"
+          }
+        }
+      }
     },
-    "Recent Builds" : {
-
+    "Build.Status.Skipped" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skipped"
+          }
+        }
+      }
     },
-    "Retry" : {
-
+    "Build.Status.Succeeded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Succeeded"
+          }
+        }
+      }
     },
-    "Select a branch or tag..." : {
-
+    "Build.Status.Unknown" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown"
+          }
+        }
+      }
     },
-    "Select Reference" : {
-
+    "More.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        }
+      }
     },
-    "Setup" : {
-
+    "Onboarding.APIKeyInfo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API Key Information"
+          }
+        }
+      }
     },
-    "Sign Out" : {
-
+    "Onboarding.APIKeyInfoFooter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find these values in App Store Connect under Users and Access > Integrations > App Store Connect API."
+          }
+        }
+      }
     },
-    "Source" : {
-
+    "Onboarding.Connect" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect"
+          }
+        }
+      }
     },
-    "Start Build" : {
-
+    "Onboarding.Connecting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting…"
+          }
+        }
+      }
     },
-    "Started" : {
-
+    "Onboarding.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect your App Store Connect account to manage Xcode Cloud builds."
+          }
+        }
+      }
     },
-    "Starting Build..." : {
-
+    "Onboarding.ImportFromFile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import from File"
+          }
+        }
+      }
     },
-    "Status" : {
-
+    "Onboarding.IssuerID" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Issuer ID"
+          }
+        }
+      }
     },
-    "Tags" : {
-
+    "Onboarding.KeyID" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key ID"
+          }
+        }
+      }
     },
-    "View Latest Build" : {
-
+    "Onboarding.PrivateKey" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private Key (.p8)"
+          }
+        }
+      }
     },
-    "Welcome to Symphony" : {
-
+    "Onboarding.PrivateKeyFooter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste the contents of your .p8 file or import it directly."
+          }
+        }
+      }
     },
-    "Workflow" : {
-
+    "Onboarding.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setup"
+          }
+        }
+      }
+    },
+    "Onboarding.Welcome" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welcome to Symphony"
+          }
+        }
+      }
+    },
+    "Shared.Cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "Shared.Done" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        }
+      }
+    },
+    "Shared.Retry" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        }
+      }
+    },
+    "Shared.SignOut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
+          }
+        }
+      }
+    },
+    "Shared.SourceCode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Code"
+          }
+        }
+      }
+    },
+    "Workflows.FailedToLoad" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to Load"
+          }
+        }
+      }
+    },
+    "Workflows.Loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading workflows…"
+          }
+        }
+      }
+    },
+    "Workflows.NoBuildsYet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No builds yet"
+          }
+        }
+      }
+    },
+    "Workflows.NoWorkflows" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Workflows"
+          }
+        }
+      }
+    },
+    "Workflows.NoWorkflowsDescription" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Xcode Cloud workflows found for this app."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

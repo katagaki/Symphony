@@ -11,30 +11,30 @@ struct WorkflowsView: View {
         Group {
             if let manager {
                 if manager.isLoading && manager.workflows.isEmpty {
-                    ProgressView("Loading workflows...")
+                    ProgressView("Workflows.Loading")
                 } else if let error = manager.error, manager.workflows.isEmpty {
                     ContentUnavailableView {
-                        Label("Failed to Load", systemImage: "exclamationmark.triangle")
+                        Label("Workflows.FailedToLoad", systemImage: "exclamationmark.triangle")
                     } description: {
                         Text(error)
                     } actions: {
-                        Button("Retry") {
+                        Button("Shared.Retry") {
                             Task { await manager.loadWorkflows() }
                         }
                     }
                 } else if manager.workflows.isEmpty {
                     ContentUnavailableView(
-                        "No Workflows",
+                        "Workflows.NoWorkflows",
                         systemImage: "hammer.fill",
-                        description: Text("No Xcode Cloud workflows found for this app.")
+                        description: Text("Workflows.NoWorkflowsDescription")
                     )
                 } else {
                     List {
                         Section {
-                            HStack(spacing: 12) {
+                            VStack(spacing: 8) {
                                 AppIconView(bundleId: app.attributes.bundleId)
                                     .frame(width: 64, height: 64)
-                                VStack(alignment: .leading, spacing: 4) {
+                                VStack(spacing: 4) {
                                     Text(app.attributes.name)
                                         .font(.headline)
                                     Text(app.attributes.bundleId)
@@ -42,6 +42,7 @@ struct WorkflowsView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
+                            .frame(maxWidth: .infinity)
                             .padding(.vertical, 2)
                             .listRowBackground(Color.clear)
                         }
@@ -64,7 +65,6 @@ struct WorkflowsView: View {
                 ProgressView()
             }
         }
-        .navigationTitle(app.attributes.name)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showStartBuild) {
             if let workflow = selectedWorkflow, let api = authManager.api {
@@ -92,7 +92,7 @@ struct WorkflowsView: View {
                     ($0.attributes.number ?? 0) > ($1.attributes.number ?? 0)
                 }
             if builds.isEmpty {
-                Text("No builds yet")
+                Text("Workflows.NoBuildsYet")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             } else {
@@ -107,9 +107,12 @@ struct WorkflowsView: View {
                                 Text("Build #\(buildRun.attributes.number ?? 0)")
                                     .font(.headline)
                                 if let branchName = manager.branchNamesByBuildRun[buildRun.id] {
-                                    Label(branchName, systemImage: "arrow.triangle.branch")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                    HStack(spacing: 2) {
+                                        Image(systemName: "arrow.triangle.branch")
+                                        Text(branchName)
+                                    }
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                                 }
                                 if let commit = buildRun.attributes.sourceCommit,
                                    let message = commit.message {
@@ -129,7 +132,7 @@ struct WorkflowsView: View {
                                     await manager.cancelBuildRun(id: buildRun.id)
                                 }
                             } label: {
-                                Label("Cancel", systemImage: "xmark.circle")
+                                Label("Shared.Cancel", systemImage: "xmark.circle")
                             }
                         }
                     }
@@ -143,8 +146,11 @@ struct WorkflowsView: View {
                     selectedWorkflow = workflow
                     showStartBuild = true
                 } label: {
-                    Label("Start Build", systemImage: "play.fill")
-                        .font(.caption)
+                    HStack(spacing: 2) {
+                        Image(systemName: "play.fill")
+                        Text("Build.Start.Title")
+                    }
+                    .font(.caption)
                 }
             }
         }

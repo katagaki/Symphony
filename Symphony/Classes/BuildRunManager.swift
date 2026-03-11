@@ -94,11 +94,11 @@ final class BuildRunManager {
                let url = URL(string: urlString) {
                 let data = try await api.downloadArtifact(url: url)
 
-                // Try UTF-8 first, then try decompressing as gzip
-                if let text = String(data: data, encoding: .utf8) {
+                // Try decompressing as gzip first, then fall back to UTF-8
+                if let decompressed = Self.decompressGzip(data: data),
+                   let text = String(data: decompressed, encoding: .utf8) {
                     logText = text
-                } else if let decompressed = Self.decompressGzip(data: data),
-                          let text = String(data: decompressed, encoding: .utf8) {
+                } else if let text = String(data: data, encoding: .utf8) {
                     logText = text
                 } else {
                     // Try latin1 as last resort

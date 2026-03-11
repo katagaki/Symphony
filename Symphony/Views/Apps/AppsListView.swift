@@ -1,8 +1,15 @@
 import SwiftUI
 
-enum AppSortOrder: String, CaseIterable {
-    case name = "Name"
-    case bundleId = "Bundle ID"
+enum AppSortOrder: CaseIterable {
+    case name
+    case bundleId
+
+    var localizedName: String {
+        switch self {
+        case .name: return String(localized: "Apps.Sort.Name")
+        case .bundleId: return String(localized: "Apps.Sort.BundleID")
+        }
+    }
 }
 
 struct AppsListView: View {
@@ -25,22 +32,22 @@ struct AppsListView: View {
         Group {
             if let manager = appsManager {
                 if manager.isLoading && manager.apps.isEmpty {
-                    ProgressView("Loading apps...")
+                    ProgressView("Apps.Loading")
                 } else if let error = manager.error, manager.apps.isEmpty {
                     ContentUnavailableView {
-                        Label("Failed to Load", systemImage: "exclamationmark.triangle")
+                        Label("Apps.FailedToLoad", systemImage: "exclamationmark.triangle")
                     } description: {
                         Text(error)
                     } actions: {
-                        Button("Retry") {
+                        Button("Shared.Retry") {
                             Task { await manager.loadApps() }
                         }
                     }
                 } else if manager.apps.isEmpty {
                     ContentUnavailableView(
-                        "No Apps",
+                        "Apps.NoApps",
                         systemImage: "app.dashed",
-                        description: Text("No apps found in your App Store Connect account.")
+                        description: Text("Apps.NoAppsDescription")
                     )
                 } else {
                     List(sortedApps) { app in
@@ -57,36 +64,32 @@ struct AppsListView: View {
                 ProgressView()
             }
         }
-        .navigationTitle("Apps")
+        .navigationTitle("Apps.Title")
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Menu {
-                    Picker("Sort By", selection: $sortOrder) {
+                    Picker("Apps.SortBy", selection: $sortOrder) {
                         ForEach(AppSortOrder.allCases, id: \.self) { order in
-                            Text(order.rawValue)
+                            Text(order.localizedName)
                         }
                     }
                 } label: {
                     Image(systemName: "arrow.up.arrow.down")
                 }
             }
-            ToolbarItem(placement: .primaryAction) {
-                Spacer()
-            }
+            ToolbarSpacer(.fixed)
             ToolbarItemGroup(placement: .primaryAction) {
                 Menu {
                     Button(role: .destructive) {
                         authManager.signOut()
                     } label: {
-                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        Label("Shared.SignOut", systemImage: "rectangle.portrait.and.arrow.right")
                     }
                     Divider()
                     Button {
                         openURL(URL(string: "https://github.com/katagaki/Symphony")!)
                     } label: {
-                        LabeledContent("Source Code") {
-                            Text("katagaki/Symphony")
-                        }
+                        Label("Shared.SourceCode", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
                 } label: {
                     Image(systemName: "ellipsis")

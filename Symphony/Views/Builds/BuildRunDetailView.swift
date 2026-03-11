@@ -10,34 +10,47 @@ struct BuildRunDetailView: View {
         Group {
             if let manager {
                 if manager.isLoading && manager.actions.isEmpty {
-                    ProgressView("Loading build details...")
+                    ProgressView("Build.Detail.Loading")
                 } else {
                     List {
-                        Section("Status") {
-                            LabeledContent("Progress") {
-                                BuildStatusBadge(
+                        Section {
+                            VStack(spacing: 8) {
+                                let badge = BuildStatusBadge(
                                     progress: manager.buildRun?.attributes.executionProgress,
                                     status: manager.buildRun?.attributes.completionStatus
                                 )
+                                Image(systemName: badge.iconName)
+                                    .font(.system(size: 56))
+                                    .symbolRenderingMode(.multicolor)
+                                    .foregroundStyle(badge.iconColor)
+                                Text(badge.labelText)
+                                    .font(.headline)
+                                    .foregroundStyle(.secondary)
                             }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 4)
+                        }
+                        .listRowBackground(Color.clear)
+
+                        Section {
                             if let created = manager.buildRun?.attributes.createdDate {
-                                LabeledContent("Created", value: formatDate(created))
+                                LabeledContent("Build.Detail.Created", value: formatDate(created))
                             }
                             if let started = manager.buildRun?.attributes.startedDate {
-                                LabeledContent("Started", value: formatDate(started))
+                                LabeledContent("Build.Detail.Started", value: formatDate(started))
                             }
                             if let finished = manager.buildRun?.attributes.finishedDate {
-                                LabeledContent("Finished", value: formatDate(finished))
+                                LabeledContent("Build.Detail.Finished", value: formatDate(finished))
                             }
                         }
 
                         if let commit = manager.buildRun?.attributes.sourceCommit {
-                            Section("Source") {
+                            Section("Build.Source") {
                                 if let sha = commit.commitSha {
-                                    LabeledContent("Commit", value: String(sha.prefix(7)))
+                                    LabeledContent("Build.Source.Commit", value: String(sha.prefix(7)))
                                 }
                                 if let author = commit.author?.displayName {
-                                    LabeledContent("Author", value: author)
+                                    LabeledContent("Build.Source.Author", value: author)
                                 }
                                 if let message = commit.message {
                                     Text(message)
@@ -48,7 +61,7 @@ struct BuildRunDetailView: View {
                         }
 
                         if !manager.actions.isEmpty {
-                            Section("Actions") {
+                            Section("Build.Actions") {
                                 ForEach(manager.actions.sorted {
                                     ($0.attributes.startedDate ?? "") < ($1.attributes.startedDate ?? "")
                                 }) { action in
@@ -57,7 +70,7 @@ struct BuildRunDetailView: View {
                                     } label: {
                                         HStack {
                                             VStack(alignment: .leading, spacing: 4) {
-                                                Text(action.attributes.name ?? action.attributes.actionType ?? "Action")
+                                                Text(action.attributes.name ?? action.attributes.actionType ?? String(localized: "Build.Actions.Action"))
                                                     .font(.headline)
                                                     .foregroundStyle(.primary)
                                                 if let issues = action.attributes.issueCounts {
@@ -132,4 +145,3 @@ struct BuildRunDetailView: View {
         return date.formatted(date: .abbreviated, time: .shortened)
     }
 }
-
