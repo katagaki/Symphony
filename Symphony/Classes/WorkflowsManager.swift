@@ -95,17 +95,6 @@ final class WorkflowsManager {
         branchNamesByBuildRun = allBranchNames
     }
 
-    func cancelBuildRun(id: String) async {
-        if isDemoMode { return }
-        guard let api else { return }
-        do {
-            try await api.cancelBuildRun(id: id)
-            await refreshBuildRuns()
-        } catch {
-            self.error = error.localizedDescription
-        }
-    }
-
     func startAutoRefresh() {
         if isDemoMode { return }
         stopAutoRefresh()
