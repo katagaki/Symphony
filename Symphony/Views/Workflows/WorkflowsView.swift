@@ -160,18 +160,6 @@ struct WorkflowsView: View {
                             }
                         }
                     }
-                    .swipeActions(edge: .trailing) {
-                        if buildRun.attributes.executionProgress == .pending
-                            || buildRun.attributes.executionProgress == .running {
-                            Button(role: .destructive) {
-                                Task {
-                                    await manager.cancelBuildRun(id: buildRun.id)
-                                }
-                            } label: {
-                                Label("Shared.Cancel", systemImage: "xmark.circle")
-                            }
-                        }
-                    }
                 }
                 if !isExpanded && builds.count > initialBuildCount {
                     Button {
