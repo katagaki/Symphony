@@ -175,7 +175,7 @@ struct AppsListView: View {
     private func appsGrid(manager: AppsManager) -> some View {
         ScrollView {
             LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 100), spacing: 16)],
+                columns: [GridItem(.adaptive(minimum: 100), spacing: 16, alignment: .top)],
                 spacing: 16
             ) {
                 ForEach(filteredAndSortedApps) { app in
@@ -186,7 +186,7 @@ struct AppsListView: View {
                             Text(app.attributes.name)
                                 .font(.subheadline)
                                 .multilineTextAlignment(.center)
-                                .lineLimit(2)
+                                .lineLimit(1)
                                 .foregroundStyle(.primary)
                         }
                         .frame(maxWidth: .infinity)

@@ -33,6 +33,7 @@ struct AccountsView: View {
                                 }
                             }
                         }
+                        .tint(.primary)
                         .swipeActions(edge: .trailing) {
                             Button(role: .destructive) {
                                 authManager.deleteAccount(account)
@@ -69,7 +70,7 @@ struct AccountsView: View {
             .navigationTitle("Accounts.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(role: .close) {
                         dismiss()
                     }
