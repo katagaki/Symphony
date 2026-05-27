@@ -9,13 +9,15 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthenticationManager.self) private var authManager
+    @Namespace private var namespace
 
     var body: some View {
         if authManager.isAuthenticated {
             NavigationStack {
-                AppsListView()
+                AppsListView(namespace: namespace)
                     .navigationDestination(for: CiApp.self) { app in
                         WorkflowsView(app: app)
+                            .navigationTransition(.zoom(sourceID: app.id, in: namespace))
                     }
                     .navigationDestination(for: CiBuildRun.self) { buildRun in
                         BuildRunDetailView(buildRun: buildRun)
