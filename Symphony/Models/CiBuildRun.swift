@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct CiBuildRun: Decodable, Identifiable, Sendable, Hashable {
+nonisolated struct CiBuildRun: Codable, Identifiable, Sendable, Hashable {
     let id: String
     let attributes: Attributes
     let relationships: Relationships?
@@ -13,7 +13,7 @@ nonisolated struct CiBuildRun: Decodable, Identifiable, Sendable, Hashable {
         lhs.id == rhs.id
     }
 
-    nonisolated struct Attributes: Decodable, Sendable {
+    nonisolated struct Attributes: Codable, Sendable {
         let number: Int?
         let createdDate: String?
         let startedDate: String?
@@ -24,33 +24,33 @@ nonisolated struct CiBuildRun: Decodable, Identifiable, Sendable, Hashable {
         let isPullRequestBuild: Bool?
     }
 
-    nonisolated struct SourceCommit: Decodable, Sendable {
+    nonisolated struct SourceCommit: Codable, Sendable {
         let commitSha: String?
         let message: String?
         let author: Author?
 
-        nonisolated struct Author: Decodable, Sendable {
+        nonisolated struct Author: Codable, Sendable {
             let displayName: String?
         }
     }
 
-    nonisolated struct Relationships: Decodable, Sendable {
+    nonisolated struct Relationships: Codable, Sendable {
         let workflow: ResourceRelationship?
         let sourceBranchOrTag: ResourceRelationship?
 
-        nonisolated struct ResourceRelationship: Decodable, Sendable {
+        nonisolated struct ResourceRelationship: Codable, Sendable {
             let data: APIResourceIdentifier?
         }
     }
 }
 
-nonisolated enum ExecutionProgress: String, Decodable, Sendable {
+nonisolated enum ExecutionProgress: String, Codable, Sendable {
     case pending = "PENDING"
     case running = "RUNNING"
     case complete = "COMPLETE"
 }
 
-nonisolated enum CompletionStatus: String, Decodable, Sendable {
+nonisolated enum CompletionStatus: String, Codable, Sendable {
     case succeeded = "SUCCEEDED"
     case failed = "FAILED"
     case errored = "ERRORED"

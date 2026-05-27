@@ -1,11 +1,11 @@
 import Foundation
 
-nonisolated struct CiWorkflow: Decodable, Identifiable, Sendable, Hashable {
+nonisolated struct CiWorkflow: Codable, Identifiable, Sendable, Hashable {
     let id: String
     let attributes: Attributes
     let relationships: Relationships?
 
-    nonisolated struct Attributes: Decodable, Sendable, Hashable {
+    nonisolated struct Attributes: Codable, Sendable, Hashable {
         let name: String
         let description: String?
         let lastModifiedDate: String?
@@ -13,10 +13,10 @@ nonisolated struct CiWorkflow: Decodable, Identifiable, Sendable, Hashable {
         let isLockedForEditing: Bool?
     }
 
-    nonisolated struct Relationships: Decodable, Sendable, Hashable {
+    nonisolated struct Relationships: Codable, Sendable, Hashable {
         let repository: RepositoryRelationship?
 
-        nonisolated struct RepositoryRelationship: Decodable, Sendable, Hashable {
+        nonisolated struct RepositoryRelationship: Codable, Sendable, Hashable {
             let data: APIResourceIdentifier?
         }
     }

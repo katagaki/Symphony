@@ -8,7 +8,11 @@ nonisolated enum KeychainService {
         case issuerID = "issuer_id"
         case keyID = "key_id"
         case privateKey = "private_key"
+        case accounts = "accounts"
+        case selectedAccount = "selected_account"
     }
+
+    static let legacyKeys: [Key] = [.issuerID, .keyID, .privateKey]
 
     nonisolated static func save(_ value: String, for key: Key) throws {
         guard let data = value.data(using: .utf8) else { return }
@@ -69,6 +73,40 @@ nonisolated enum KeychainService {
         for key in Key.allCases {
             delete(for: key)
         }
+    }
+
+    nonisolated static func deleteLegacyCredentials() {
+        for key in legacyKeys {
+            delete(for: key)
+        }
+    }
+
+    // MARK: - Accounts
+
+    nonisolated static func saveAccounts(_ accounts: [Account], selectedID: UUID?) {
+        if let data = try? JSONEncoder().encode(accounts),
+           let string = String(data: data, encoding: .utf8) {
+            try? save(string, for: .accounts)
+        }
+        if let selectedID {
+            try? save(selectedID.uuidString, for: .selectedAccount)
+        } else {
+            delete(for: .selectedAccount)
+        }
+    }
+
+    nonisolated static func loadAccounts() -> [Account]? {
+        guard let string = load(for: .accounts),
+              let data = string.data(using: .utf8),
+              let accounts = try? JSONDecoder().decode([Account].self, from: data) else {
+            return nil
+        }
+        return accounts
+    }
+
+    nonisolated static func loadSelectedAccountID() -> UUID? {
+        guard let string = load(for: .selectedAccount) else { return nil }
+        return UUID(uuidString: string)
     }
 }
 
