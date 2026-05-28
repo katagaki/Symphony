@@ -75,7 +75,7 @@ struct AddAccountView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Shared.Cancel", role: .cancel) {
+                    Button(role: .cancel) {
                         dismiss()
                     }
                 }
@@ -83,7 +83,7 @@ struct AddAccountView: View {
                     if isValidating {
                         ProgressView()
                     } else {
-                        Button("Accounts.AddAction") {
+                        Button(role: .confirm) {
                             Task { await add() }
                         }
                         .disabled(!canConnect)

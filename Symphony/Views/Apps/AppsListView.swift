@@ -175,21 +175,23 @@ struct AppsListView: View {
     private func appsGrid(manager: AppsManager) -> some View {
         ScrollView {
             LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 100), spacing: 16, alignment: .top)],
+                columns: [GridItem(.adaptive(minimum: 70), spacing: 16, alignment: .top)],
                 spacing: 16
             ) {
                 ForEach(filteredAndSortedApps) { app in
                     NavigationLink(value: app) {
                         VStack(spacing: 8) {
                             AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
-                                .frame(width: 80, height: 80)
+                                .frame(width: 60, height: 60)
                             Text(app.attributes.name)
                                 .font(.subheadline)
                                 .multilineTextAlignment(.center)
                                 .lineLimit(1)
+                                .truncationMode(.middle)
                                 .foregroundStyle(.primary)
                         }
                         .frame(maxWidth: .infinity)
+                        .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
                     .matchedTransitionSource(id: app.id, in: namespace)
