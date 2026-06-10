@@ -19,8 +19,8 @@ struct ContentView: View {
                         WorkflowsView(app: app)
                             .navigationTransition(.zoom(sourceID: app.id, in: namespace))
                     }
-                    .navigationDestination(for: CiBuildRun.self) { buildRun in
-                        BuildRunDetailView(buildRun: buildRun)
+                    .navigationDestination(for: BuildRunRoute.self) { route in
+                        BuildRunDetailView(app: route.app, buildRun: route.buildRun)
                     }
             }
         } else {

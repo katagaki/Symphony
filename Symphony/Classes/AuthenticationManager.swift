@@ -94,6 +94,18 @@ final class AuthenticationManager {
         }
     }
 
+    var selectedTeamID: String? {
+        selectedAccount?.teamID
+    }
+
+    func setTeamID(_ teamID: String?) {
+        guard let account = selectedAccount,
+              let index = accounts.firstIndex(where: { $0.id == account.id }) else { return }
+        let trimmed = teamID?.trimmingCharacters(in: .whitespacesAndNewlines)
+        accounts[index].teamID = (trimmed?.isEmpty == false) ? trimmed : nil
+        persist()
+    }
+
     func renameAccount(_ account: Account, to newName: String) {
         let trimmed = newName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty,
@@ -107,6 +119,7 @@ final class AuthenticationManager {
         if selectedAccountID == account.id {
             selectedAccountID = accounts.first?.id
         }
+        AppListCache.shared.remove(forAccountID: account.id.uuidString)
         persist()
         updateAPI()
     }
@@ -124,6 +137,8 @@ final class AuthenticationManager {
 
     func signOut() {
         KeychainService.deleteAll()
+        AppListCache.shared.clearAll()
+        WorkflowCache.shared.clearAll()
         accounts = []
         selectedAccountID = nil
         api = nil

@@ -10,6 +10,7 @@ final class BuildRunManager {
     var logText: String?
     var gitReferences: [GitReference] = []
     var isLoading: Bool = false
+    var isRefreshing: Bool = false
     var isStartingBuild: Bool = false
     var isLoadingLog: Bool = false
     var error: String?
@@ -27,7 +28,11 @@ final class BuildRunManager {
         self.isDemoMode = true
     }
 
-    func loadBuildRun(id: String) async {
+    func loadBuildRun(id: String, initial: CiBuildRun? = nil) async {
+        // Seed with the build run from the list so details render without waiting on the network.
+        if buildRun == nil, let initial, initial.id == id {
+            buildRun = initial
+        }
         isLoading = true
         error = nil
         if isDemoMode {
@@ -41,6 +46,24 @@ final class BuildRunManager {
             }
         }
         isLoading = false
+    }
+
+    /// Refetches the build run without tearing down already-rendered content.
+    func refreshBuildRun(id: String) async {
+        if isDemoMode { return }
+        guard let api else { return }
+        isRefreshing = true
+        do {
+            buildRun = try await api.getBuildRun(id: id)
+            actions = try await api.listBuildActions(forBuildRunID: id)
+            error = nil
+        } catch {
+            // Keep showing existing data; only surface the error if we have nothing.
+            if actions.isEmpty {
+                self.error = error.localizedDescription
+            }
+        }
+        isRefreshing = false
     }
 
     func loadGitReferences(workflowID: String) async {
@@ -88,12 +111,15 @@ final class BuildRunManager {
         while buildRun?.attributes.executionProgress != .complete {
             try? await Task.sleep(for: .seconds(10))
             if Task.isCancelled { break }
+            isRefreshing = true
             do {
                 buildRun = try await api.getBuildRun(id: id)
                 actions = try await api.listBuildActions(forBuildRunID: id)
             } catch {
+                isRefreshing = false
                 break
             }
+            isRefreshing = false
         }
     }
 

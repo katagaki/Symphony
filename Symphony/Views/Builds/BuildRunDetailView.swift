@@ -2,124 +2,152 @@ import SwiftUI
 
 struct BuildRunDetailView: View {
     @Environment(AuthenticationManager.self) private var authManager
+    @Environment(\.openURL) private var openURL
+    let app: CiApp
     let buildRun: CiBuildRun
     @State private var manager: BuildRunManager?
     @State private var selectedAction: CiBuildAction?
-    @State private var showCancelConfirmation = false
+    @State private var showTeamIDSheet = false
+
+    private var currentBuildRun: CiBuildRun? {
+        manager?.buildRun ?? buildRun
+    }
+
+    private var isBuildInProgress: Bool {
+        currentBuildRun?.attributes.executionProgress == .pending
+            || currentBuildRun?.attributes.executionProgress == .running
+    }
 
     var body: some View {
         Group {
             if let manager {
-                if manager.isLoading && manager.actions.isEmpty {
-                    ProgressView("Build.Detail.Loading")
-                } else {
-                    List {
-                        Section {
-                            VStack(spacing: 4) {
-                                let badge = BuildStatusBadge(
-                                    progress: manager.buildRun?.attributes.executionProgress,
-                                    status: manager.buildRun?.attributes.completionStatus
-                                )
-                                Image(systemName: badge.iconName)
-                                    .font(.system(size: 56))
-                                    .symbolRenderingMode(.hierarchical)
-                                    .foregroundStyle(badge.iconColor)
-                                Text(badge.labelText)
-                                    .font(.headline)
+                List {
+                    Section {
+                        VStack(spacing: 4) {
+                            let badge = BuildStatusBadge(
+                                progress: currentBuildRun?.attributes.executionProgress,
+                                status: currentBuildRun?.attributes.completionStatus
+                            )
+                            Image(systemName: badge.iconName)
+                                .font(.system(size: 56))
+                                .symbolRenderingMode(.hierarchical)
+                                .foregroundStyle(badge.iconColor)
+                            Text(badge.labelText)
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 4)
+                    }
+                    .listRowBackground(Color.clear)
+                    .listSectionSpacing(.zero)
+
+                    Section {
+                        if let created = currentBuildRun?.attributes.createdDate {
+                            LabeledContent("Build.Detail.Created", value: formatDate(created))
+                        }
+                        if let started = currentBuildRun?.attributes.startedDate {
+                            LabeledContent("Build.Detail.Started", value: formatDate(started))
+                        }
+                        if let finished = currentBuildRun?.attributes.finishedDate {
+                            LabeledContent("Build.Detail.Finished", value: formatDate(finished))
+                        }
+                        // There is no official API to cancel a build, so builds are
+                        // stopped from the App Store Connect website instead.
+                        if isBuildInProgress && !authManager.isDemoMode {
+                            Button(role: .destructive) {
+                                if authManager.selectedTeamID != nil {
+                                    openStopBuildPage()
+                                } else {
+                                    showTeamIDSheet = true
+                                }
+                            } label: {
+                                Label("Build.Detail.StopBuildWeb", systemImage: "stop.circle")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
+                        }
+                    }
+
+                    if let commit = currentBuildRun?.attributes.sourceCommit {
+                        Section("Build.Source") {
+                            if let sha = commit.commitSha {
+                                LabeledContent("Build.Source.Commit", value: String(sha.prefix(7)))
+                            }
+                            if let author = commit.author?.displayName {
+                                LabeledContent("Build.Source.Author", value: author)
+                            }
+                            if let message = commit.message {
+                                Text(message)
+                                    .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 4)
                         }
-                        .listRowBackground(Color.clear)
-                        .listSectionSpacing(.zero)
+                    }
 
-                        Section {
-                            if let created = manager.buildRun?.attributes.createdDate {
-                                LabeledContent("Build.Detail.Created", value: formatDate(created))
-                            }
-                            // TODO: No API to run this, will need to wait for an official API
-//                            if manager.buildRun?.attributes.executionProgress == .pending
-//                                || manager.buildRun?.attributes.executionProgress == .running {
-//                                Button(role: .destructive) {
-//                                    showCancelConfirmation = true
-//                                } label: {
-//                                    Text("Build.Detail.CancelBuild")
-//                                        .frame(maxWidth: .infinity)
-//                                }
-//                                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
-//                            }
-                            if let started = manager.buildRun?.attributes.startedDate {
-                                LabeledContent("Build.Detail.Started", value: formatDate(started))
-                            }
-                            if let finished = manager.buildRun?.attributes.finishedDate {
-                                LabeledContent("Build.Detail.Finished", value: formatDate(finished))
-                            }
+                    if manager.isLoading && manager.actions.isEmpty {
+                        Section("Build.Actions") {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
                         }
-
-                        if let commit = manager.buildRun?.attributes.sourceCommit {
-                            Section("Build.Source") {
-                                if let sha = commit.commitSha {
-                                    LabeledContent("Build.Source.Commit", value: String(sha.prefix(7)))
-                                }
-                                if let author = commit.author?.displayName {
-                                    LabeledContent("Build.Source.Author", value: author)
-                                }
-                                if let message = commit.message {
-                                    Text(message)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-
-                        if !manager.actions.isEmpty {
-                            Section("Build.Actions") {
-                                ForEach(manager.actions.sorted {
-                                    ($0.attributes.startedDate ?? "") < ($1.attributes.startedDate ?? "")
-                                }) { action in
-                                    Button {
-                                        selectedAction = action
-                                    } label: {
-                                        HStack {
-                                            VStack(alignment: .leading, spacing: 4) {
-                                                Text(action.attributes.name ?? action.attributes.actionType ?? String(localized: "Build.Actions.Action"))
-                                                    .font(.headline)
-                                                if let issues = action.attributes.issueCounts {
-                                                    HStack(spacing: 12) {
-                                                        if let errors = issues.errors, errors > 0 {
-                                                            Label("\(errors)", systemImage: "xmark.circle.fill")
-                                                                .symbolRenderingMode(.multicolor)
-                                                        }
-                                                        if let warnings = issues.warnings, warnings > 0 {
-                                                            Label("\(warnings)", systemImage: "exclamationmark.triangle.fill")
-                                                                .symbolRenderingMode(.multicolor)
-                                                        }
-                                                        if let failures = issues.testFailures, failures > 0 {
-                                                            Label("\(failures)", systemImage: "xmark.diamond.fill")
-                                                                .symbolRenderingMode(.multicolor)
-                                                        }
+                    } else if !manager.actions.isEmpty {
+                        Section("Build.Actions") {
+                            ForEach(manager.actions.sorted {
+                                ($0.attributes.startedDate ?? "") < ($1.attributes.startedDate ?? "")
+                            }) { action in
+                                Button {
+                                    selectedAction = action
+                                } label: {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(action.attributes.name ?? action.attributes.actionType ?? String(localized: "Build.Actions.Action"))
+                                                .font(.headline)
+                                            if let issues = action.attributes.issueCounts {
+                                                HStack(spacing: 12) {
+                                                    if let errors = issues.errors, errors > 0 {
+                                                        Label("\(errors)", systemImage: "xmark.circle.fill")
+                                                            .symbolRenderingMode(.multicolor)
                                                     }
-                                                    .font(.caption)
+                                                    if let warnings = issues.warnings, warnings > 0 {
+                                                        Label("\(warnings)", systemImage: "exclamationmark.triangle.fill")
+                                                            .symbolRenderingMode(.multicolor)
+                                                    }
+                                                    if let failures = issues.testFailures, failures > 0 {
+                                                        Label("\(failures)", systemImage: "xmark.diamond.fill")
+                                                            .symbolRenderingMode(.multicolor)
+                                                    }
                                                 }
+                                                .font(.caption)
                                             }
-                                            Spacer()
-                                            BuildStatusBadge(
-                                                progress: action.attributes.executionProgress,
-                                                status: action.attributes.completionStatus
-                                            )
                                         }
+                                        Spacer()
+                                        BuildStatusBadge(
+                                            progress: action.attributes.executionProgress,
+                                            status: action.attributes.completionStatus
+                                        )
                                     }
-                                    .tint(.primary)
-                                    .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                                 }
+                                .tint(.primary)
+                                .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
                             }
                         }
                     }
-                    .contentMargins(.top, 0, for: .scrollContent)
-                    .refreshable {
-                        await manager.loadBuildRun(id: buildRun.id)
+                }
+                .contentMargins(.top, 0, for: .scrollContent)
+                .refreshable {
+                    await manager.refreshBuildRun(id: buildRun.id)
+                }
+                .toolbar {
+                    ToolbarItemGroup(placement: .topBarTrailing) {
+                        Group {
+                            if manager.isRefreshing {
+                                ProgressView()
+                            } else {
+                                EmptyView()
+                            }
+                        }
                     }
+                    .sharedBackgroundVisibility(.hidden)
                 }
             } else {
                 ProgressView()
@@ -136,17 +164,10 @@ struct BuildRunDetailView: View {
                     .interactiveDismissDisabled()
             }
         }
-        .alert("Build.Detail.CancelBuild", isPresented: $showCancelConfirmation) {
-            Button("Build.Detail.CancelBuild", role: .destructive) {
-                Task {
-                    if let id = manager?.buildRun?.id {
-                        await manager?.cancelBuildRun(id: id)
-                    }
-                }
+        .sheet(isPresented: $showTeamIDSheet) {
+            TeamIDView { _ in
+                openStopBuildPage()
             }
-            Button("Shared.Cancel", role: .cancel) {}
-        } message: {
-            Text("Build.Detail.CancelConfirmation")
         }
         .task {
             if manager == nil {
@@ -158,7 +179,7 @@ struct BuildRunDetailView: View {
                     m = BuildRunManager(api: api)
                 }
                 manager = m
-                await m.loadBuildRun(id: buildRun.id)
+                await m.loadBuildRun(id: buildRun.id, initial: buildRun)
 
                 // Poll if build is still in progress
                 if buildRun.attributes.executionProgress != .complete {
@@ -166,6 +187,14 @@ struct BuildRunDetailView: View {
                 }
             }
         }
+    }
+
+    private func openStopBuildPage() {
+        guard let teamID = authManager.selectedTeamID,
+              let url = URL(string: "https://appstoreconnect.apple.com/teams/\(teamID)/apps/\(app.id)/ci/builds/\(buildRun.id)/summary") else {
+            return
+        }
+        openURL(url)
     }
 
     private func formatDate(_ isoString: String) -> String {

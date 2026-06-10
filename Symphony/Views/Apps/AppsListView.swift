@@ -39,6 +39,7 @@ struct AppsListView: View {
     @State private var searchText = ""
     @State private var forceRefreshIcons = false
     @State private var showAccounts = false
+    @State private var showTeamID = false
     @AppStorage("appsViewMode") private var viewMode: AppsViewMode = .list
     @Environment(\.openURL) private var openURL
 
@@ -111,6 +112,16 @@ struct AppsListView: View {
                 }
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
+                Group {
+                    if appsManager?.isRefreshing == true {
+                        ProgressView()
+                    } else {
+                        EmptyView()
+                    }
+                }
+            }
+            .sharedBackgroundVisibility(.hidden)
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Menu {
                     Picker("Apps.ViewAs", selection: $viewMode) {
                         ForEach(AppsViewMode.allCases, id: \.self) { mode in
@@ -124,6 +135,13 @@ struct AppsListView: View {
                         showAccounts = true
                     } label: {
                         Label("Accounts.Title", systemImage: "person.crop.circle")
+                    }
+                    if !authManager.isDemoMode {
+                        Button {
+                            showTeamID = true
+                        } label: {
+                            Label("TeamID.MenuItem", systemImage: "person.2.badge.key")
+                        }
                     }
                     Button(role: .destructive) {
                         authManager.signOut()
@@ -144,13 +162,16 @@ struct AppsListView: View {
         .sheet(isPresented: $showAccounts) {
             AccountsView()
         }
+        .sheet(isPresented: $showTeamID) {
+            TeamIDView()
+        }
         .task(id: accountTaskID) {
             let manager: AppsManager
             if authManager.isDemoMode {
                 manager = AppsManager(demoMode: true)
             } else {
                 guard let api = authManager.api else { return }
-                manager = AppsManager(api: api)
+                manager = AppsManager(api: api, accountID: authManager.selectedAccount?.id.uuidString)
             }
             appsManager = manager
             await manager.loadApps()

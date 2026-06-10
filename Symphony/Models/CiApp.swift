@@ -1,10 +1,10 @@
 import Foundation
 
-nonisolated struct CiApp: Decodable, Identifiable, Sendable, Hashable {
+nonisolated struct CiApp: Codable, Identifiable, Sendable, Hashable {
     let id: String
     let attributes: Attributes
 
-    nonisolated struct Attributes: Decodable, Sendable, Hashable {
+    nonisolated struct Attributes: Codable, Sendable, Hashable {
         let name: String
         let bundleId: String
     }

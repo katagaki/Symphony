@@ -133,7 +133,7 @@ struct WorkflowsView: View {
                 let isExpanded = expandedWorkflows.contains(workflow.id)
                 let visibleBuilds = isExpanded ? builds : Array(builds.prefix(initialBuildCount))
                 ForEach(visibleBuilds) { buildRun in
-                    NavigationLink(value: buildRun) {
+                    NavigationLink(value: BuildRunRoute(app: app, buildRun: buildRun)) {
                         HStack(spacing: 16) {
                             BuildStatusIcon(
                                 progress: buildRun.attributes.executionProgress,
