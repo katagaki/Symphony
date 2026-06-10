@@ -62,7 +62,7 @@ struct BuildRunDetailView: View {
                                     showTeamIDSheet = true
                                 }
                             } label: {
-                                Label("Build.Detail.StopBuildWeb", systemImage: "stop.circle")
+                                Text("Build.Detail.StopBuildWeb")
                                     .frame(maxWidth: .infinity)
                             }
                             .alignmentGuide(.listRowSeparatorLeading) { _ in 0 }
