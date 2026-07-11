@@ -1,11 +1,16 @@
 import Foundation
 import Observation
 
+nonisolated struct CachedAppList: Codable, Sendable {
+    var apps: [CiApp]
+    var fetchedAt: Date
+}
+
 @Observable
 final class AppListCache {
     static let shared = AppListCache()
 
-    private var entries: [String: [CiApp]] = [:]
+    private var entries: [String: CachedAppList] = [:]
     private let cacheURL: URL
 
     private init() {
@@ -14,12 +19,12 @@ final class AppListCache {
         loadFromDisk()
     }
 
-    func load(forAccountID accountID: String) -> [CiApp]? {
+    func load(forAccountID accountID: String) -> CachedAppList? {
         entries[accountID]
     }
 
     func save(_ apps: [CiApp], forAccountID accountID: String) {
-        entries[accountID] = apps
+        entries[accountID] = CachedAppList(apps: apps, fetchedAt: .now)
         saveToDisk()
     }
 
@@ -36,11 +41,15 @@ final class AppListCache {
     // MARK: - Persistence
 
     private func loadFromDisk() {
-        guard let data = try? Data(contentsOf: cacheURL),
-              let decoded = try? JSONDecoder().decode([String: [CiApp]].self, from: data) else {
-            return
+        guard let data = try? Data(contentsOf: cacheURL) else { return }
+        if let decoded = try? JSONDecoder().decode([String: CachedAppList].self, from: data) {
+            entries = decoded
+        } else if let legacy = try? JSONDecoder().decode([String: [CiApp]].self, from: data) {
+            // Migrate the pre-timestamp format; the file's modification date is the
+            // closest approximation of when the data was fetched.
+            let modified = (try? FileManager.default.attributesOfItem(atPath: cacheURL.path))?[.modificationDate] as? Date
+            entries = legacy.mapValues { CachedAppList(apps: $0, fetchedAt: modified ?? .distantPast) }
         }
-        entries = decoded
     }
 
     private func saveToDisk() {

@@ -7,6 +7,10 @@ final class AppsManager {
     var isLoading: Bool = false
     var isRefreshing: Bool = false
     var error: String?
+    /// When the data currently on screen was fetched from the network.
+    var lastUpdated: Date?
+    /// True when the last refresh failed and the view is showing cached data.
+    var isShowingStaleData: Bool = false
 
     private let api: AppStoreConnectAPI?
     private let isDemoMode: Bool
@@ -39,11 +43,16 @@ final class AppsManager {
 
         do {
             apps = try await api.listApps()
+            lastUpdated = .now
+            isShowingStaleData = false
             saveCache()
         } catch {
-            // Keep showing cached data on failure; only surface the error if we have nothing.
-            if !hadCache {
+            // Keep showing cached data on failure, but let the view flag it as stale;
+            // only surface the error if we have nothing.
+            if apps.isEmpty {
                 self.error = error.localizedDescription
+            } else {
+                isShowingStaleData = true
             }
         }
         isLoading = false
@@ -57,10 +66,11 @@ final class AppsManager {
         guard apps.isEmpty,
               let cacheKey,
               let cached = AppListCache.shared.load(forAccountID: cacheKey),
-              !cached.isEmpty else {
+              !cached.apps.isEmpty else {
             return !apps.isEmpty
         }
-        apps = cached
+        apps = cached.apps
+        lastUpdated = cached.fetchedAt
         return true
     }
 

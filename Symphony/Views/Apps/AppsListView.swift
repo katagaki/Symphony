@@ -94,6 +94,14 @@ struct AppsListView: View {
                 ProgressView()
             }
         }
+        .safeAreaInset(edge: .top) {
+            if let manager = appsManager, manager.isShowingStaleData, !manager.apps.isEmpty {
+                StaleDataBanner(lastUpdated: manager.lastUpdated) {
+                    await manager.loadApps()
+                }
+            }
+        }
+        .animation(.smooth, value: appsManager?.isShowingStaleData == true)
         .searchable(text: $searchText, prompt: Text("Apps.SearchPrompt"))
         .animation(.smooth.speed(2.0), value: searchText)
         .navigationTitle("Apps.Title")

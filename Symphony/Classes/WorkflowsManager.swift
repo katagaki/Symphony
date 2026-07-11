@@ -10,6 +10,10 @@ final class WorkflowsManager {
     var isLoadingBuilds: Bool = false
     var isRefreshing: Bool = false
     var error: String?
+    /// When the data currently on screen was fetched from the network.
+    var lastUpdated: Date?
+    /// True when the last refresh failed and the view is showing cached data.
+    var isShowingStaleData: Bool = false
 
     let api: AppStoreConnectAPI?
     let app: CiApp
@@ -59,11 +63,16 @@ final class WorkflowsManager {
             isLoadingBuilds = !hadCache
             await loadBuildRunsPerWorkflow()
             isLoadingBuilds = false
+            lastUpdated = .now
+            isShowingStaleData = false
             saveCache()
         } catch {
-            // Keep showing cached data on failure; only surface the error if we have nothing.
-            if !hadCache {
+            // Keep showing cached data on failure, but let the view flag it as stale;
+            // only surface the error if we have nothing.
+            if workflows.isEmpty {
                 self.error = error.localizedDescription
+            } else {
+                isShowingStaleData = true
             }
         }
         isLoading = false
@@ -73,8 +82,14 @@ final class WorkflowsManager {
         if isDemoMode { return }
         guard productID != nil else { return }
         isRefreshing = true
-        await loadBuildRunsPerWorkflow()
-        saveCache()
+        let anySucceeded = await loadBuildRunsPerWorkflow()
+        if anySucceeded {
+            lastUpdated = .now
+            isShowingStaleData = false
+            saveCache()
+        } else if !workflows.isEmpty {
+            isShowingStaleData = true
+        }
         isRefreshing = false
     }
 
@@ -94,6 +109,7 @@ final class WorkflowsManager {
         workflows = sortedByName(cached.workflows)
         buildRunsByWorkflow = cached.buildRunsByWorkflow
         branchNamesByBuildRun = cached.branchNamesByBuildRun
+        lastUpdated = cached.fetchedAt
         return true
     }
 
@@ -103,7 +119,8 @@ final class WorkflowsManager {
             productID: productID,
             workflows: workflows,
             buildRunsByWorkflow: buildRunsByWorkflow,
-            branchNamesByBuildRun: branchNamesByBuildRun
+            branchNamesByBuildRun: branchNamesByBuildRun,
+            fetchedAt: lastUpdated
         )
         WorkflowCache.shared.save(cached, forAppID: app.id)
     }
@@ -119,12 +136,16 @@ final class WorkflowsManager {
         branchNamesByBuildRun = allBranchNames
     }
 
-    private func loadBuildRunsPerWorkflow() async {
-        guard let api else { return }
+    /// Returns true when at least one workflow's build runs were fetched successfully
+    /// (or there was nothing to fetch), so callers can tell a live result from stale data.
+    @discardableResult
+    private func loadBuildRunsPerWorkflow() async -> Bool {
+        guard let api else { return false }
         // Seed with existing data so a failed per-workflow fetch keeps its cached builds.
         var grouped = buildRunsByWorkflow
         var allBranchNames = branchNamesByBuildRun
         let workflowIDs = Set(workflows.map(\.id))
+        var anySucceeded = workflows.isEmpty
         await withTaskGroup(of: (String, [CiBuildRun], [String: String])?.self) { group in
             for workflow in workflows {
                 group.addTask {
@@ -136,6 +157,7 @@ final class WorkflowsManager {
             }
             for await result in group {
                 guard let (workflowID, runs, branchNames) = result else { continue }
+                anySucceeded = true
                 grouped[workflowID] = runs
                 allBranchNames.merge(branchNames) { _, new in new }
             }
@@ -144,6 +166,7 @@ final class WorkflowsManager {
         grouped = grouped.filter { workflowIDs.contains($0.key) }
         buildRunsByWorkflow = grouped
         branchNamesByBuildRun = allBranchNames
+        return anySucceeded
     }
 
     func startAutoRefresh() {

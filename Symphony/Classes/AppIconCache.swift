@@ -7,12 +7,13 @@ final class AppIconCache {
 
     private struct CacheEntry: Codable {
         let urlString: String
-        var lastAccessed: Date
+        var fetchedAt: Date
     }
 
     private var entries: [String: CacheEntry] = [:]
     private let cacheURL: URL
-    private let ttl: TimeInterval = 3600 // 1 hour
+    private let ttl: TimeInterval = 24 * 3600 // Refresh icon URLs after a day.
+    private let maxAge: TimeInterval = 7 * 24 * 3600 // Drop entries untouched for a week.
 
     private init() {
         let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
@@ -22,16 +23,21 @@ final class AppIconCache {
     }
 
     func iconURL(for bundleId: String, forceRefresh: Bool = false) async -> URL? {
-        if !forceRefresh, let entry = entries[bundleId] {
-            entries[bundleId]?.lastAccessed = Date()
-            saveToDisk()
-            return URL(string: entry.urlString)
+        let cached = entries[bundleId]
+        if !forceRefresh, let cached, Date().timeIntervalSince(cached.fetchedAt) < ttl {
+            return URL(string: cached.urlString)
         }
 
-        guard let url = await fetchIconURL(bundleId: bundleId) else { return nil }
-        entries[bundleId] = CacheEntry(urlString: url.absoluteString, lastAccessed: Date())
-        saveToDisk()
-        return url
+        if let url = await fetchIconURL(bundleId: bundleId) {
+            entries[bundleId] = CacheEntry(urlString: url.absoluteString, fetchedAt: .now)
+            saveToDisk()
+            return url
+        }
+        // The refresh failed; keep serving the stale URL rather than dropping the icon.
+        if let cached {
+            return URL(string: cached.urlString)
+        }
+        return nil
     }
 
     func clearAll() {
@@ -56,7 +62,9 @@ final class AppIconCache {
 
     private func pruneExpired() {
         let now = Date()
-        entries = entries.filter { now.timeIntervalSince($0.value.lastAccessed) < ttl }
+        let pruned = entries.filter { now.timeIntervalSince($0.value.fetchedAt) < maxAge }
+        guard pruned.count != entries.count else { return }
+        entries = pruned
         saveToDisk()
     }
 

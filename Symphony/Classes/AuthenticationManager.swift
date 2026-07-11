@@ -119,7 +119,12 @@ final class AuthenticationManager {
         if selectedAccountID == account.id {
             selectedAccountID = accounts.first?.id
         }
-        AppListCache.shared.remove(forAccountID: account.id.uuidString)
+        let accountKey = account.id.uuidString
+        // Drop workflow data cached for this account's apps before forgetting the app list.
+        if let cachedApps = AppListCache.shared.load(forAccountID: accountKey)?.apps {
+            WorkflowCache.shared.remove(forAppIDs: cachedApps.map(\.id))
+        }
+        AppListCache.shared.remove(forAccountID: accountKey)
         persist()
         updateAPI()
     }

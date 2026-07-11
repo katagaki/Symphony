@@ -80,6 +80,14 @@ struct WorkflowsView: View {
                 ProgressView()
             }
         }
+        .safeAreaInset(edge: .top) {
+            if let manager, manager.isShowingStaleData, !manager.workflows.isEmpty {
+                StaleDataBanner(lastUpdated: manager.lastUpdated) {
+                    await manager.loadWorkflows()
+                }
+            }
+        }
+        .animation(.smooth, value: manager?.isShowingStaleData == true)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedWorkflow) { workflow in
             if let api = authManager.api {

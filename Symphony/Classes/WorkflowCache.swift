@@ -6,6 +6,8 @@ nonisolated struct CachedAppWorkflows: Codable, Sendable {
     var workflows: [CiWorkflow]
     var buildRunsByWorkflow: [String: [CiBuildRun]]
     var branchNamesByBuildRun: [String: String]
+    // Optional so entries written before timestamps were introduced still decode.
+    var fetchedAt: Date?
 }
 
 @Observable
@@ -27,6 +29,14 @@ final class WorkflowCache {
 
     func save(_ cached: CachedAppWorkflows, forAppID appID: String) {
         entries[appID] = cached
+        saveToDisk()
+    }
+
+    func remove(forAppIDs appIDs: [String]) {
+        guard !appIDs.isEmpty else { return }
+        for appID in appIDs {
+            entries.removeValue(forKey: appID)
+        }
         saveToDisk()
     }
 
