@@ -157,10 +157,10 @@ struct BuildRunDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedAction) { action in
             if authManager.isDemoMode {
-                BuildLogView(action: action, demoMode: true)
+                BuildActionDetailView(action: action, demoMode: true)
                     .interactiveDismissDisabled()
             } else if let api = authManager.api {
-                BuildLogView(action: action, api: api)
+                BuildActionDetailView(action: action, api: api)
                     .interactiveDismissDisabled()
             }
         }

@@ -9,10 +9,14 @@ final class BuildRunManager {
     var artifacts: [String: [CiArtifact]] = [:]
     var logText: String?
     var gitReferences: [GitReference] = []
+    var pullRequests: [ScmPullRequest] = []
+    var issues: [CiIssue] = []
     var isLoading: Bool = false
     var isRefreshing: Bool = false
     var isStartingBuild: Bool = false
     var isLoadingLog: Bool = false
+    var isLoadingIssues: Bool = false
+    var isLoadingSources: Bool = false
     var error: String?
 
     let api: AppStoreConnectAPI?
@@ -66,16 +70,22 @@ final class BuildRunManager {
         isRefreshing = false
     }
 
-    func loadGitReferences(workflowID: String) async {
+    /// Loads the branches, tags, and open pull requests a build can be started from.
+    func loadBuildSources(workflowID: String) async {
         if isDemoMode { return }
         guard let api else { return }
+        isLoadingSources = true
         do {
             if let repoID = try await api.getWorkflowRepositoryID(workflowID: workflowID) {
                 gitReferences = try await api.listGitReferences(forRepositoryID: repoID)
+                // Pull requests are optional; a failure here shouldn't block branch selection.
+                let allPullRequests = (try? await api.listPullRequests(forRepositoryID: repoID)) ?? []
+                pullRequests = allPullRequests.filter { $0.attributes.isClosed != true }
             }
         } catch {
             self.error = error.localizedDescription
         }
+        isLoadingSources = false
     }
 
     func startBuild(workflowID: String, gitReferenceID: String) async {
@@ -92,6 +102,42 @@ final class BuildRunManager {
             self.error = error.localizedDescription
         }
         isStartingBuild = false
+    }
+
+    func startBuild(workflowID: String, pullRequestID: String) async {
+        if isDemoMode { return }
+        guard let api else { return }
+        isStartingBuild = true
+        error = nil
+        do {
+            buildRun = try await api.startBuildRun(
+                workflowID: workflowID,
+                pullRequestID: pullRequestID
+            )
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isStartingBuild = false
+    }
+
+    func loadIssues(forActionID actionID: String) async {
+        isLoadingIssues = true
+        issues = []
+        if isDemoMode {
+            issues = DemoData.issues(forBuildActionID: actionID)
+            isLoadingIssues = false
+            return
+        }
+        guard let api else {
+            isLoadingIssues = false
+            return
+        }
+        do {
+            issues = try await api.listIssues(forBuildActionID: actionID)
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isLoadingIssues = false
     }
 
     func cancelBuildRun(id: String) async {

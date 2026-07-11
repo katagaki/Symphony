@@ -40,6 +40,7 @@ struct AppsListView: View {
     @State private var forceRefreshIcons = false
     @State private var showAccounts = false
     @State private var showTeamID = false
+    @State private var showDemoAccountsAlert = false
     @AppStorage("appsViewMode") private var viewMode: AppsViewMode = .list
     @Environment(\.openURL) private var openURL
 
@@ -140,7 +141,11 @@ struct AppsListView: View {
                     .pickerStyle(.inline)
                     Divider()
                     Button {
-                        showAccounts = true
+                        if authManager.isDemoMode {
+                            showDemoAccountsAlert = true
+                        } else {
+                            showAccounts = true
+                        }
                     } label: {
                         Label("Accounts.Title", systemImage: "person.crop.circle")
                     }
@@ -154,7 +159,11 @@ struct AppsListView: View {
                     Button(role: .destructive) {
                         authManager.signOut()
                     } label: {
-                        Label("Shared.SignOut", systemImage: "rectangle.portrait.and.arrow.right")
+                        if authManager.isDemoMode {
+                            Label("Shared.ExitDemoMode", systemImage: "rectangle.portrait.and.arrow.right")
+                        } else {
+                            Label("Shared.SignOut", systemImage: "rectangle.portrait.and.arrow.right")
+                        }
                     }
                     Divider()
                     Button {
@@ -169,6 +178,11 @@ struct AppsListView: View {
         }
         .sheet(isPresented: $showAccounts) {
             AccountsView()
+        }
+        .alert("Demo.AccountsUnavailable.Title", isPresented: $showDemoAccountsAlert) {
+            Button("Shared.OK", role: .cancel) {}
+        } message: {
+            Text("Demo.AccountsUnavailable.Message")
         }
         .sheet(isPresented: $showTeamID) {
             TeamIDView()

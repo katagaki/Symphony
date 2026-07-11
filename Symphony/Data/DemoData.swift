@@ -89,11 +89,14 @@ enum DemoData {
 
     // MARK: - Build Actions
 
-    static func buildActions(forBuildRunID buildRunID: String) -> [CiBuildAction] {
-        // Determine status from build run
-        let allBuilds = xenonIOSBuilds + xenonMacOSBuilds
+    private static var allBuilds: [CiBuildRun] {
+        xenonIOSBuilds + xenonMacOSBuilds
             + amethystIOSBuilds + amethystMacOSBuilds
             + dahliaIOSBuilds + dahliaMacOSBuilds
+    }
+
+    static func buildActions(forBuildRunID buildRunID: String) -> [CiBuildAction] {
+        // Determine status from build run
         guard let build = allBuilds.first(where: { $0.id == buildRunID }) else {
             return []
         }
@@ -125,6 +128,61 @@ enum DemoData {
                     issueCounts: isFailed
                         ? .init(analyzerWarnings: 0, errors: 0, testFailures: 2, warnings: 0)
                         : .init(analyzerWarnings: 0, errors: 0, testFailures: 0, warnings: 0)
+                )
+            ),
+        ]
+    }
+
+    // MARK: - Issues
+
+    static func issues(forBuildActionID actionID: String) -> [CiIssue] {
+        let buildRunID: String
+        let isTestAction: Bool
+        if actionID.hasSuffix("-action-build") {
+            buildRunID = String(actionID.dropLast("-action-build".count))
+            isTestAction = false
+        } else if actionID.hasSuffix("-action-test") {
+            buildRunID = String(actionID.dropLast("-action-test".count))
+            isTestAction = true
+        } else {
+            return []
+        }
+
+        guard let build = allBuilds.first(where: { $0.id == buildRunID }),
+              build.attributes.completionStatus == .failed else {
+            return []
+        }
+
+        if isTestAction {
+            return [
+                CiIssue(
+                    id: "\(actionID)-issue-1",
+                    attributes: .init(
+                        issueType: .testFailure,
+                        message: "testImageCacheEviction(): XCTAssertEqual failed: (\"3\") is not equal to (\"0\")",
+                        fileSource: .init(path: "Tests/ImageCacheTests.swift", lineNumber: 87),
+                        category: nil
+                    )
+                ),
+                CiIssue(
+                    id: "\(actionID)-issue-2",
+                    attributes: .init(
+                        issueType: .testFailure,
+                        message: "testConcurrentAccess(): Asynchronous wait failed: Exceeded timeout of 5 seconds",
+                        fileSource: .init(path: "Tests/ImageCacheTests.swift", lineNumber: 132),
+                        category: nil
+                    )
+                ),
+            ]
+        }
+        return [
+            CiIssue(
+                id: "\(actionID)-issue-1",
+                attributes: .init(
+                    issueType: .error,
+                    message: "Cannot find 'ImageCacheConfiguration' in scope",
+                    fileSource: .init(path: "Sources/Caching/ImageCache.swift", lineNumber: 42),
+                    category: nil
                 )
             ),
         ]

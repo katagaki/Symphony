@@ -91,7 +91,25 @@ actor AppStoreConnectAPI {
                 type: "ciBuildRuns",
                 relationships: .init(
                     workflow: .init(data: .init(type: "ciWorkflows", id: workflowID)),
-                    sourceBranchOrTag: .init(data: .init(type: "scmGitReferences", id: gitReferenceID))
+                    sourceBranchOrTag: .init(data: .init(type: "scmGitReferences", id: gitReferenceID)),
+                    pullRequest: nil
+                )
+            )
+        )
+        let response: APIResponse<CiBuildRun> = try await client.post(
+            path: "/v1/ciBuildRuns", body: body
+        )
+        return response.data
+    }
+
+    func startBuildRun(workflowID: String, pullRequestID: String) async throws -> CiBuildRun {
+        let body = StartBuildRunRequest(
+            data: .init(
+                type: "ciBuildRuns",
+                relationships: .init(
+                    workflow: .init(data: .init(type: "ciWorkflows", id: workflowID)),
+                    sourceBranchOrTag: nil,
+                    pullRequest: .init(data: .init(type: "scmPullRequests", id: pullRequestID))
                 )
             )
         )
@@ -111,6 +129,16 @@ actor AppStoreConnectAPI {
     func listBuildActions(forBuildRunID buildRunID: String) async throws -> [CiBuildAction] {
         let response: APIListResponse<CiBuildAction> = try await client.get(
             path: "/v1/ciBuildRuns/\(buildRunID)/actions"
+        )
+        return response.data
+    }
+
+    // MARK: - Issues
+
+    func listIssues(forBuildActionID actionID: String) async throws -> [CiIssue] {
+        let response: APIListResponse<CiIssue> = try await client.get(
+            path: "/v1/ciBuildActions/\(actionID)/issues",
+            queryItems: [URLQueryItem(name: "limit", value: "200")]
         )
         return response.data
     }
@@ -137,6 +165,16 @@ actor AppStoreConnectAPI {
         )
         return response.data
     }
+
+    // MARK: - Pull Requests
+
+    func listPullRequests(forRepositoryID repoID: String) async throws -> [ScmPullRequest] {
+        let response: APIListResponse<ScmPullRequest> = try await client.get(
+            path: "/v1/scmRepositories/\(repoID)/pullRequests",
+            queryItems: [URLQueryItem(name: "limit", value: "200")]
+        )
+        return response.data
+    }
 }
 
 // MARK: - Request Bodies
@@ -151,7 +189,8 @@ nonisolated struct StartBuildRunRequest: Encodable, Sendable {
 
     nonisolated struct Relationships: Encodable, Sendable {
         let workflow: Relationship
-        let sourceBranchOrTag: Relationship
+        let sourceBranchOrTag: Relationship?
+        let pullRequest: Relationship?
     }
 
     nonisolated struct Relationship: Encodable, Sendable {
