@@ -198,20 +198,31 @@ func compose(_ shot: Screenshot, language: String, device: Device) -> Bool {
     // From the top of the header's glyphs to the bottom of the caption's.
     let inkHeight = header.ink.maxY + baselineGap - caption.ink.minY
 
-    // The whole device sits below the text band, centered in the space that is left.
     let screenAspect = CGFloat(rawRep.pixelsWide) / CGFloat(rawRep.pixelsHigh)
     let screenHeightPerWidth = (1 - 2 * device.bezel) / screenAspect
     let aspect = 1 / (screenHeightPerWidth + 2 * device.bezel)
     let deviceTop = canvasSize.height - inkHeight - 2 * 120 * s
-    let availableHeight = deviceTop - 120 * s
-    var deviceSize = NSSize(width: availableHeight * aspect, height: availableHeight)
-    if deviceSize.width > canvasSize.width - 2 * margin {
-        deviceSize.width = canvasSize.width - 2 * margin
-        deviceSize.height = deviceSize.width / aspect
+    var deviceSize: NSSize
+    let deviceBottom: CGFloat
+    switch device {
+    case .iPhone:
+        // The whole device sits below the text band, centered in the space that is left.
+        let availableHeight = deviceTop - 120 * s
+        deviceSize = NSSize(width: availableHeight * aspect, height: availableHeight)
+        if deviceSize.width > canvasSize.width - 2 * margin {
+            deviceSize.width = canvasSize.width - 2 * margin
+            deviceSize.height = deviceSize.width / aspect
+        }
+        deviceBottom = deviceTop - (availableHeight + deviceSize.height) / 2
+    case .iPad:
+        // The iPad is as wide as the margins allow, hangs from the text band, and runs a
+        // little off the bottom of the canvas.
+        deviceSize = NSSize(width: canvasSize.width - 2 * margin, height: (canvasSize.width - 2 * margin) / aspect)
+        deviceBottom = deviceTop - deviceSize.height
     }
     let deviceRect = NSRect(
         x: ((canvasSize.width - deviceSize.width) / 2).rounded(),
-        y: (deviceTop - (availableHeight + deviceSize.height) / 2).rounded(),
+        y: deviceBottom.rounded(),
         width: deviceSize.width,
         height: deviceSize.height
     )
