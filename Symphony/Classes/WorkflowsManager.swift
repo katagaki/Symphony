@@ -33,7 +33,7 @@ final class WorkflowsManager {
         self.isDemoMode = true
     }
 
-    deinit {
+    isolated deinit {
         refreshTask?.cancel()
     }
 
