@@ -192,7 +192,7 @@ struct BuildRunDetailView: View {
 
     private func openStopBuildPage() {
         guard let teamID = authManager.selectedTeamID,
-              let url = URL(string: "https://appstoreconnect.apple.com/teams/\(teamID)/apps/\(app.id)/ci/builds/\(buildRun.id)/summary") else {
+              let url = URL(string: "https://appstoreconnect.apple.com/teams/\(teamID)/xcode-cloud/products/\(app.id)/builds/\(buildRun.id)/summary") else {
             return
         }
         openURL(url)
