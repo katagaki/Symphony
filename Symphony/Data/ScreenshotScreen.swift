@@ -1,10 +1,11 @@
 import SwiftUI
 
 /// A screen staged for the App Store screenshots, from the `-ScreenshotScreen` launch argument
-/// that `Assets/App Store/capture.sh` passes. Either one starts the app in demo mode.
+/// that `Assets/App Store/capture.sh` passes. Any of them starts the app in demo mode.
 enum ScreenshotScreen: String {
     case apps
     case builds
+    case accounts
 
     static var current: ScreenshotScreen? {
         #if DEBUG
@@ -14,7 +15,12 @@ enum ScreenshotScreen: String {
         #endif
     }
 
-    /// The app selected in the split view. Both screens show its builds beside the list, so
+    /// The accounts signed in, held in memory only.
+    var accounts: [Account] {
+        self == .accounts ? DemoData.accounts : []
+    }
+
+    /// The app selected in the split view. Every screen shows its builds beside the list, so
     /// the detail column is never left empty.
     var app: CiApp? {
         DemoData.apps.first(where: { $0.id == "demo-app-sirius" })

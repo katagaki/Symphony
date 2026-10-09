@@ -75,6 +75,13 @@ let screenshots = [
             .iPad: ["en": Copy(header: "View and start builds", caption: "With just a tap (or click)")],
         ]
     ),
+    Screenshot(
+        name: "03-accounts",
+        copy: [
+            .iPhone: ["en": Copy(header: "All your teams", caption: "Switch accounts in a tap")],
+            .iPad: ["en": Copy(header: "All your teams", caption: "Switch accounts in a tap")],
+        ]
+    ),
 ]
 
 // MARK: - Text

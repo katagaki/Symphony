@@ -13,7 +13,7 @@ BUNDLE_ID=com.tsubuzaki.Symphony
 DERIVED_DATA=/tmp/symphony-screenshots-dd
 LANGUAGES=($@)
 (( $# )) || LANGUAGES=(en)
-SCREENS=(01-apps:apps 02-builds:builds)
+SCREENS=(01-apps:apps 02-builds:builds 03-accounts:accounts)
 typeset -A DEVICE_TYPES=(
   iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-18-Pro-Max
   iPad com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB

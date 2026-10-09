@@ -2,6 +2,16 @@ import Foundation
 
 enum DemoData {
 
+    // MARK: - Accounts
+
+    /// Sample accounts for the App Store screenshots. They are never saved or used to sign in.
+    static let accounts: [Account] = [
+        Account(name: "Yorigami Studio", issuerID: "demo-issuer-yorigami", keyID: "8XK2M4QZ7P", privateKey: ""),
+        Account(name: "Personal", issuerID: "demo-issuer-personal", keyID: "R3T9WB6N2C", privateKey: ""),
+        Account(name: "Moonlit Apps", issuerID: "demo-issuer-moonlit", keyID: "J7D4HV8L5F", privateKey: ""),
+        Account(name: "Kailua Co.", issuerID: "demo-issuer-kailua", keyID: "Q2P6ZY3M9A", privateKey: ""),
+    ]
+
     // MARK: - Apps
 
     static let apps: [CiApp] = [

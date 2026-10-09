@@ -18,7 +18,11 @@ final class AuthenticationManager {
 
     init() {
         loadFromKeychain()
-        isDemoMode = ScreenshotScreen.current != nil
+        if let screen = ScreenshotScreen.current {
+            isDemoMode = true
+            accounts = screen.accounts
+            selectedAccountID = accounts.first?.id
+        }
     }
 
     var isAuthenticated: Bool {

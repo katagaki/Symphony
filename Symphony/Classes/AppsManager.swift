@@ -1,3 +1,4 @@
+import AppIntents
 import Foundation
 import Observation
 
@@ -51,6 +52,8 @@ final class AppsManager {
             lastUpdated = .now
             isShowingStaleData = false
             saveCache()
+            // Let Siri and Spotlight offer phrases for the newly loaded apps.
+            ConductorShortcuts.updateAppShortcutParameters()
         } catch {
             // Keep showing cached data on failure, but let the view flag it as stale;
             // only surface the error if we have nothing.

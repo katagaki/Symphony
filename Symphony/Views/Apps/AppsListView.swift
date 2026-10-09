@@ -40,7 +40,7 @@ struct AppsListView: View {
     @State private var sortOrder: AppSortOrder = .name
     @State private var searchText = ""
     @State private var forceRefreshIcons = false
-    @State private var showAccounts = false
+    @State private var showAccounts = ScreenshotScreen.current == .accounts
     @State private var showTeamID = false
     @State private var showDemoAccountsAlert = false
     @AppStorage("appsViewMode") private var viewMode: AppsViewMode = .list
