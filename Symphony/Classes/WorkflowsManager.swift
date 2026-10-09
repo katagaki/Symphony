@@ -166,6 +166,7 @@ final class WorkflowsManager {
         grouped = grouped.filter { workflowIDs.contains($0.key) }
         buildRunsByWorkflow = grouped
         branchNamesByBuildRun = allBranchNames
+        AppIconCache.shared.noteBuildRuns(grouped.values.flatMap { $0 }, for: app, api: api)
         return anySucceeded
     }
 

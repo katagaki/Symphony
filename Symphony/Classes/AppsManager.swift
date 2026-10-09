@@ -93,6 +93,9 @@ final class AppsManager {
                 case .success(let run):
                     latest[appID] = run
                     checkedAppIDs.append(appID)
+                    if let run, let app = apps.first(where: { $0.id == appID }) {
+                        AppIconCache.shared.noteBuildRuns([run], for: app, api: api)
+                    }
                 case .failure(APIError.notFound):
                     // No Xcode Cloud product for this app.
                     latest[appID] = nil
