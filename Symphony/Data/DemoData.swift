@@ -8,6 +8,10 @@ enum DemoData {
         CiApp(id: "demo-app-xenon", attributes: .init(name: "Xenon", bundleId: "com.yorigami.xenon")),
         CiApp(id: "demo-app-amethyst", attributes: .init(name: "Amethyst", bundleId: "com.yorigami.amethyst")),
         CiApp(id: "demo-app-dahlia", attributes: .init(name: "Dahlia", bundleId: "com.yorigami.dahlia")),
+        CiApp(id: "demo-app-sirius", attributes: .init(name: "Sirius", bundleId: "com.yorigami.sirius")),
+        CiApp(id: "demo-app-oboro", attributes: .init(name: "Oboro", bundleId: "com.yorigami.oboro")),
+        CiApp(id: "demo-app-codezero", attributes: .init(name: "Code Zero", bundleId: "com.yorigami.codezero")),
+        CiApp(id: "demo-app-kailua", attributes: .init(name: "Kailua", bundleId: "com.yorigami.kailua")),
     ]
 
     // MARK: - Icon Names
@@ -16,13 +20,18 @@ enum DemoData {
         "com.yorigami.xenon": "App.Xenon",
         "com.yorigami.amethyst": "App.Amethyst",
         "com.yorigami.dahlia": "App.Dahlia",
+        "com.yorigami.sirius": "App.Sirius",
+        "com.yorigami.oboro": "App.Oboro",
+        "com.yorigami.codezero": "App.CodeZero",
+        "com.yorigami.kailua": "App.Kailua",
     ]
 
     // MARK: - Workflows
 
     static func workflows(forAppID appID: String) -> [CiWorkflow] {
         switch appID {
-        case "demo-app-xenon", "demo-app-amethyst", "demo-app-dahlia":
+        case "demo-app-xenon", "demo-app-amethyst", "demo-app-dahlia",
+             "demo-app-sirius", "demo-app-oboro", "demo-app-codezero", "demo-app-kailua":
             return [
                 CiWorkflow(
                     id: "\(appID)-workflow-ios",
@@ -74,6 +83,26 @@ enum DemoData {
         // Dahlia macOS - 3 builds
         case "demo-app-dahlia-workflow-macos":
             return dahliaMacOSBuilds
+        // Sirius iOS - latest build still running
+        case "demo-app-sirius-workflow-ios":
+            return siriusIOSBuilds
+        case "demo-app-sirius-workflow-macos":
+            return siriusMacOSBuilds
+        // Oboro iOS - latest build failed
+        case "demo-app-oboro-workflow-ios":
+            return oboroIOSBuilds
+        case "demo-app-oboro-workflow-macos":
+            return oboroMacOSBuilds
+        // Code Zero iOS - latest build pending
+        case "demo-app-codezero-workflow-ios":
+            return codeZeroIOSBuilds
+        case "demo-app-codezero-workflow-macos":
+            return codeZeroMacOSBuilds
+        // Kailua - all builds succeeded
+        case "demo-app-kailua-workflow-ios":
+            return kailuaIOSBuilds
+        case "demo-app-kailua-workflow-macos":
+            return kailuaMacOSBuilds
         default:
             return []
         }
@@ -99,6 +128,10 @@ enum DemoData {
         xenonIOSBuilds + xenonMacOSBuilds
             + amethystIOSBuilds + amethystMacOSBuilds
             + dahliaIOSBuilds + dahliaMacOSBuilds
+            + siriusIOSBuilds + siriusMacOSBuilds
+            + oboroIOSBuilds + oboroMacOSBuilds
+            + codeZeroIOSBuilds + codeZeroMacOSBuilds
+            + kailuaIOSBuilds + kailuaMacOSBuilds
     }
 
     static func buildActions(forBuildRunID buildRunID: String) -> [CiBuildAction] {
@@ -107,14 +140,16 @@ enum DemoData {
             return []
         }
         let isFailed = build.attributes.completionStatus == .failed
+        let progress = build.attributes.executionProgress ?? .complete
+        let actionStatus: CompletionStatus? = progress == .complete ? (isFailed ? .failed : .succeeded) : nil
         return [
             CiBuildAction(
                 id: "\(buildRunID)-action-build",
                 attributes: .init(
                     name: "Build",
                     actionType: "BUILD",
-                    executionProgress: .complete,
-                    completionStatus: isFailed ? .failed : .succeeded,
+                    executionProgress: progress,
+                    completionStatus: actionStatus,
                     startedDate: build.attributes.startedDate,
                     finishedDate: build.attributes.finishedDate,
                     issueCounts: isFailed
@@ -127,8 +162,8 @@ enum DemoData {
                 attributes: .init(
                     name: "Test",
                     actionType: "TEST",
-                    executionProgress: .complete,
-                    completionStatus: isFailed ? .failed : .succeeded,
+                    executionProgress: progress,
+                    completionStatus: actionStatus,
                     startedDate: build.attributes.startedDate,
                     finishedDate: build.attributes.finishedDate,
                     issueCounts: isFailed
@@ -254,10 +289,73 @@ enum DemoData {
                   date: "2026-03-08T10:30:00Z", message: "Initial commit"),
     ]
 
+    // MARK: - Sirius Builds (latest running)
+
+    private static let siriusIOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "sirius-ios-1", number: 12, status: nil, progress: .running,
+                  date: "2026-03-11T09:15:00Z", message: "Add constellation search"),
+        makeBuild(id: "sirius-ios-2", number: 11, status: .succeeded,
+                  date: "2026-03-10T16:00:00Z", message: "Improve star map rendering"),
+        makeBuild(id: "sirius-ios-3", number: 10, status: .succeeded,
+                  date: "2026-03-09T10:00:00Z", message: "Add widget support"),
+    ]
+
+    private static let siriusMacOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "sirius-macos-1", number: 11, status: .succeeded,
+                  date: "2026-03-10T16:30:00Z", message: "Improve star map rendering"),
+        makeBuild(id: "sirius-macos-2", number: 10, status: .succeeded,
+                  date: "2026-03-09T10:30:00Z", message: "Add widget support"),
+    ]
+
+    // MARK: - Oboro Builds (latest failed)
+
+    private static let oboroIOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "oboro-ios-1", number: 7, status: .failed,
+                  date: "2026-03-11T08:40:00Z", message: "Migrate journal entries to SwiftData"),
+        makeBuild(id: "oboro-ios-2", number: 6, status: .succeeded,
+                  date: "2026-03-10T12:00:00Z", message: "Add moon phase calendar"),
+    ]
+
+    private static let oboroMacOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "oboro-macos-1", number: 6, status: .succeeded,
+                  date: "2026-03-10T12:30:00Z", message: "Add moon phase calendar"),
+    ]
+
+    // MARK: - Code Zero Builds (latest pending)
+
+    private static let codeZeroIOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "codezero-ios-1", number: 3, status: nil, progress: .pending,
+                  date: "2026-03-11T09:30:00Z", message: "Add syntax highlighting themes"),
+        makeBuild(id: "codezero-ios-2", number: 2, status: .succeeded,
+                  date: "2026-03-10T11:00:00Z", message: "Support external keyboards"),
+        makeBuild(id: "codezero-ios-3", number: 1, status: .succeeded,
+                  date: "2026-03-09T09:00:00Z", message: "Initial commit"),
+    ]
+
+    private static let codeZeroMacOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "codezero-macos-1", number: 2, status: .succeeded,
+                  date: "2026-03-10T11:30:00Z", message: "Support external keyboards"),
+    ]
+
+    // MARK: - Kailua Builds (all succeeded)
+
+    private static let kailuaIOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "kailua-ios-1", number: 4, status: .succeeded,
+                  date: "2026-03-10T17:00:00Z", message: "Add surf forecast alerts"),
+        makeBuild(id: "kailua-ios-2", number: 3, status: .succeeded,
+                  date: "2026-03-09T15:00:00Z", message: "Show tide charts"),
+    ]
+
+    private static let kailuaMacOSBuilds: [CiBuildRun] = [
+        makeBuild(id: "kailua-macos-1", number: 4, status: .succeeded,
+                  date: "2026-03-10T17:30:00Z", message: "Add surf forecast alerts"),
+    ]
+
     // MARK: - Helpers
 
     private static func makeBuild(
-        id: String, number: Int, status: CompletionStatus,
+        id: String, number: Int, status: CompletionStatus?,
+        progress: ExecutionProgress = .complete,
         date: String, message: String
     ) -> CiBuildRun {
         CiBuildRun(
@@ -265,14 +363,14 @@ enum DemoData {
             attributes: .init(
                 number: number,
                 createdDate: date,
-                startedDate: date,
-                finishedDate: date,
+                startedDate: progress == .pending ? nil : date,
+                finishedDate: progress == .complete ? date : nil,
                 sourceCommit: .init(
                     commitSha: String(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(40)),
                     message: message,
                     author: .init(displayName: "Demo User")
                 ),
-                executionProgress: .complete,
+                executionProgress: progress,
                 completionStatus: status,
                 isPullRequestBuild: false
             ),
