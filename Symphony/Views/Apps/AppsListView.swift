@@ -139,11 +139,11 @@ struct AppsListView: View {
                     moreMenu
                 }
             } else {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    moreMenu
+                ToolbarItemGroup(placement: .topBarLeading) {
+                    accountMenu
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    accountMenu
+                    moreMenu
                 }
             }
         }
