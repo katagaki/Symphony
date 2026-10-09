@@ -4535,49 +4535,49 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Füge zuerst ein App Store Connect-Konto in Symphony hinzu."
+            "value" : "Füge zuerst ein App Store Connect-Konto in Conductor hinzu."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add an App Store Connect account in Symphony first."
+            "value" : "Add an App Store Connect account in Conductor first."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Primero añade una cuenta de App Store Connect en Symphony."
+            "value" : "Primero añade una cuenta de App Store Connect en Conductor."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajoutez d'abord un compte App Store Connect dans Symphony."
+            "value" : "Ajoutez d'abord un compte App Store Connect dans Conductor."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "まずSymphonyでApp Store Connectのアカウントを追加してください。"
+            "value" : "まずConductorでApp Store Connectのアカウントを追加してください。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "먼저 Symphony에서 App Store Connect 계정을 추가하세요."
+            "value" : "먼저 Conductor에서 App Store Connect 계정을 추가하세요."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请先在 Symphony 中添加 App Store Connect 账户。"
+            "value" : "请先在 Conductor 中添加 App Store Connect 账户。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請先在 Symphony 中新增 App Store Connect 帳號。"
+            "value" : "請先在 Conductor 中新增 App Store Connect 帳號。"
           }
         }
       }
@@ -4795,49 +4795,49 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffnet die Workflows und Builds einer App in Symphony."
+            "value" : "Öffnet die Workflows und Builds einer App in Conductor."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opens an app's workflows and builds in Symphony."
+            "value" : "Opens an app's workflows and builds in Conductor."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abre los flujos de trabajo y las compilaciones de una app en Symphony."
+            "value" : "Abre los flujos de trabajo y las compilaciones de una app en Conductor."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvre les workflows et les builds d'une app dans Symphony."
+            "value" : "Ouvre les workflows et les builds d'une app dans Conductor."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "SymphonyでAppのワークフローとビルドを開きます。"
+            "value" : "ConductorでAppのワークフローとビルドを開きます。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Symphony에서 앱의 워크플로와 빌드를 엽니다."
+            "value" : "Conductor에서 앱의 워크플로와 빌드를 엽니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 Symphony 中打开 App 的工作流程和构建。"
+            "value" : "在 Conductor 中打开 App 的工作流程和构建。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "在 Symphony 中打開 App 的工作流程和建置。"
+            "value" : "在 Conductor 中打開 App 的工作流程和建置。"
           }
         }
       }
