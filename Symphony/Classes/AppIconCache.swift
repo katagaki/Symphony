@@ -107,7 +107,10 @@ final class AppIconCache {
         let task = Task { await operation() }
         inFlight[key] = task
         await task.value
-        inFlight[key] = nil
+        // A newer refresh may have replaced this one while it was finishing; leave that one in place.
+        if inFlight[key] == task {
+            inFlight[key] = nil
+        }
     }
 
     private func refresh(app: CiApp, api: AppStoreConnectAPI?, forceRefresh: Bool) async {
