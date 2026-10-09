@@ -16,14 +16,25 @@ struct ContentView: View {
     @State private var detailPath = ScreenshotScreen.current?.detailPath ?? NavigationPath()
 
     var body: some View {
-        if authManager.isAuthenticated {
-            if horizontalSizeClass == .regular {
-                splitView
+        Group {
+            if authManager.isAuthenticated {
+                if horizontalSizeClass == .regular {
+                    splitView
+                } else {
+                    stackView
+                }
             } else {
-                stackView
+                OnboardingView()
             }
-        } else {
-            OnboardingView()
+        }
+        .onChange(of: IntentNavigator.shared.pendingApp, initial: true) { _, app in
+            guard let app, authManager.isAuthenticated else { return }
+            if horizontalSizeClass == .regular {
+                selectedApp = app
+            } else {
+                path = NavigationPath([app])
+            }
+            IntentNavigator.shared.pendingApp = nil
         }
     }
 
