@@ -76,38 +76,39 @@ final class AppsManager {
         let appIDs = apps.map(\.id)
         var latest = latestBuildByApp
         var checkedAppIDs: [String] = []
+        var pending = appIDs[...]
         let maxConcurrent = 4
 
-        await withTaskGroup(of: (String, Result<CiBuildRun?, Error>).self) { group in
-            var pending = appIDs.makeIterator()
-            func addNext() {
-                guard let appID = pending.next() else { return }
-                group.addTask {
+        // Workers on the main actor take apps off the shared queue until it's empty, rather
+        // than a task group: the 1.4 crash aborted in a group child completing as statuses loaded.
+        let workers = (0..<min(maxConcurrent, appIDs.count)).map { _ in
+            Task {
+                while !Task.isCancelled, let appID = pending.popFirst() {
                     do {
-                        return (appID, .success(try await api.latestBuildRun(forAppID: appID)))
+                        let run = try await api.latestBuildRun(forAppID: appID)
+                        latest[appID] = run
+                        checkedAppIDs.append(appID)
+                        if let run, let app = apps.first(where: { $0.id == appID }) {
+                            AppIconCache.shared.noteBuildRuns([run], for: app, api: api)
+                        }
+                    } catch APIError.notFound {
+                        // No Xcode Cloud product for this app.
+                        latest[appID] = nil
+                        checkedAppIDs.append(appID)
                     } catch {
-                        return (appID, .failure(error))
+                        continue
                     }
+                    latestBuildByApp = latest
                 }
             }
-            for _ in 0..<maxConcurrent { addNext() }
-            for await (appID, result) in group {
-                switch result {
-                case .success(let run):
-                    latest[appID] = run
-                    checkedAppIDs.append(appID)
-                    if let run, let app = apps.first(where: { $0.id == appID }) {
-                        AppIconCache.shared.noteBuildRuns([run], for: app, api: api)
-                    }
-                case .failure(APIError.notFound):
-                    // No Xcode Cloud product for this app.
-                    latest[appID] = nil
-                    checkedAppIDs.append(appID)
-                case .failure:
-                    break
-                }
-                latestBuildByApp = latest
-                addNext()
+        }
+        await withTaskCancellationHandler {
+            for worker in workers {
+                await worker.value
+            }
+        } onCancel: {
+            for worker in workers {
+                worker.cancel()
             }
         }
 
