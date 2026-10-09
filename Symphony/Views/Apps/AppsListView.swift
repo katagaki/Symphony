@@ -46,6 +46,9 @@ struct AppsListView: View {
     @AppStorage("appsViewMode") private var viewMode: AppsViewMode = .list
     @Environment(\.openURL) private var openURL
 
+    /// The sidebar column reports a compact size class, so split mode is told apart by the selection.
+    private var isSidebar: Bool { selection != nil }
+
     private var accountTaskID: String {
         authManager.isDemoMode ? "demo" : (authManager.selectedAccountID?.uuidString ?? "none")
     }
@@ -110,16 +113,10 @@ struct AppsListView: View {
         .navigationTitle("Apps.Title")
         .toolbar {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-            ToolbarItemGroup(placement: .bottomBar) {
-                Menu {
-                    Picker("Apps.SortBy", selection: $sortOrder) {
-                        ForEach(AppSortOrder.allCases, id: \.self) { order in
-                            Text(order.localizedName)
-                        }
-                    }
-                } label: {
-                    Image(systemName: "arrow.up.arrow.down")
+            if !isSidebar {
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                ToolbarItemGroup(placement: .bottomBar) {
+                    sortMenu
                 }
             }
             ToolbarItemGroup(placement: .topBarTrailing) {
@@ -132,44 +129,22 @@ struct AppsListView: View {
                 }
             }
             .sharedBackgroundVisibility(.hidden)
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Menu {
-                    Picker("Apps.ViewAs", selection: $viewMode) {
-                        ForEach(AppsViewMode.allCases, id: \.self) { mode in
-                            Label(mode.localizedName, systemImage: mode.systemImage)
-                                .tag(mode)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                    Divider()
-                    if !authManager.isDemoMode {
-                        Button {
-                            showTeamID = true
-                        } label: {
-                            Label("TeamID.MenuItem", systemImage: "person.2.badge.key")
-                        }
-                    }
-                    Button(role: .destructive) {
-                        authManager.signOut()
-                    } label: {
-                        if authManager.isDemoMode {
-                            Label("Shared.ExitDemoMode", systemImage: "rectangle.portrait.and.arrow.right")
-                        } else {
-                            Label("Shared.SignOut", systemImage: "rectangle.portrait.and.arrow.right")
-                        }
-                    }
-                    Divider()
-                    Button {
-                        openURL(URL(string: "https://github.com/katagaki/Symphony")!)
-                    } label: {
-                        Label("Shared.SourceCode", systemImage: "chevron.left.forwardslash.chevron.right")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis")
+            if isSidebar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    sortMenu
                 }
-            }
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                accountMenu
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    accountMenu
+                    moreMenu
+                }
+            } else {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    moreMenu
+                }
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    accountMenu
+                }
             }
         }
         .sheet(isPresented: $showAccounts) {
@@ -193,6 +168,55 @@ struct AppsListView: View {
             }
             appsManager = manager
             await manager.loadApps()
+        }
+    }
+
+    private var sortMenu: some View {
+        Menu {
+            Picker("Apps.SortBy", selection: $sortOrder) {
+                ForEach(AppSortOrder.allCases, id: \.self) { order in
+                    Text(order.localizedName)
+                }
+            }
+        } label: {
+            Image(systemName: "arrow.up.arrow.down")
+        }
+    }
+
+    private var moreMenu: some View {
+        Menu {
+            Picker("Apps.ViewAs", selection: $viewMode) {
+                ForEach(AppsViewMode.allCases, id: \.self) { mode in
+                    Label(mode.localizedName, systemImage: mode.systemImage)
+                        .tag(mode)
+                }
+            }
+            .pickerStyle(.inline)
+            Divider()
+            if !authManager.isDemoMode {
+                Button {
+                    showTeamID = true
+                } label: {
+                    Label("TeamID.MenuItem", systemImage: "person.2.badge.key")
+                }
+            }
+            Button(role: .destructive) {
+                authManager.signOut()
+            } label: {
+                if authManager.isDemoMode {
+                    Label("Shared.ExitDemoMode", systemImage: "rectangle.portrait.and.arrow.right")
+                } else {
+                    Label("Shared.SignOut", systemImage: "rectangle.portrait.and.arrow.right")
+                }
+            }
+            Divider()
+            Button {
+                openURL(URL(string: "https://github.com/katagaki/Symphony")!)
+            } label: {
+                Label("Shared.SourceCode", systemImage: "chevron.left.forwardslash.chevron.right")
+            }
+        } label: {
+            Image(systemName: "ellipsis")
         }
     }
 
