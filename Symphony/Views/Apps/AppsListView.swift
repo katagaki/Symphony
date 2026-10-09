@@ -203,7 +203,11 @@ struct AppsListView: View {
     private func appsList(manager: AppsManager) -> some View {
         List(filteredAndSortedApps) { app in
             NavigationLink(value: app) {
-                AppRowView(app: app, forceRefreshIcons: forceRefreshIcons)
+                AppRowView(
+                    app: app,
+                    latestBuild: manager.latestBuildByApp[app.id],
+                    forceRefreshIcons: forceRefreshIcons
+                )
             }
             .matchedTransitionSource(id: app.id, in: namespace)
         }
@@ -226,6 +230,11 @@ struct AppsListView: View {
                         VStack(spacing: 8) {
                             AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
                                 .frame(width: 60, height: 60)
+                                .overlay(alignment: .bottomTrailing) {
+                                    if let latestBuild = manager.latestBuildByApp[app.id] {
+                                        AppIconBuildBadge(build: latestBuild)
+                                    }
+                                }
                             Text(app.attributes.name)
                                 .font(.subheadline)
                                 .multilineTextAlignment(.center)

@@ -2,7 +2,9 @@ import SwiftUI
 
 struct AppRowView: View {
     let app: CiApp
+    var latestBuild: CiBuildRun?
     var forceRefreshIcons: Bool = false
+    @ScaledMetric(relativeTo: .caption) private var statusIconSize: CGFloat = 14
 
     var body: some View {
         HStack(spacing: 12) {
@@ -14,9 +16,48 @@ struct AppRowView: View {
                 Text(app.attributes.bundleId)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                if let latestBuild {
+                    latestBuildStatus(latestBuild)
+                }
             }
         }
         .padding(.vertical, 2)
+    }
+
+    private func latestBuildStatus(_ build: CiBuildRun) -> some View {
+        let progress = build.attributes.executionProgress
+        let status = build.attributes.completionStatus
+        let badge = BuildStatusBadge(progress: progress, status: status)
+        return HStack(spacing: 4) {
+            BuildStatusSymbol(progress: progress, status: status, size: statusIconSize)
+            Text(badge.labelText)
+            if let number = build.attributes.number {
+                Text(verbatim: "· #\(number)")
+            }
+        }
+        .font(.caption)
+        .foregroundStyle(.secondary)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// The latest build's status drawn as a badge for the bottom-right corner of an app icon.
+struct AppIconBuildBadge: View {
+    let build: CiBuildRun
+
+    var body: some View {
+        BuildStatusSymbol(
+            progress: build.attributes.executionProgress,
+            status: build.attributes.completionStatus,
+            size: 22
+        )
+        .padding(2)
+        .background(Circle().fill(.background))
+        .offset(x: 6, y: 6)
+        .accessibilityLabel(BuildStatusBadge(
+            progress: build.attributes.executionProgress,
+            status: build.attributes.completionStatus
+        ).labelText)
     }
 }
 
