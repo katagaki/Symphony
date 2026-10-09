@@ -8,7 +8,7 @@ struct AppRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
+            AppIconView(app: app, forceRefresh: forceRefreshIcons)
                 .frame(width: 64, height: 64)
             VStack(alignment: .leading, spacing: 4) {
                 Text(app.attributes.name)
@@ -62,13 +62,17 @@ struct AppIconBuildBadge: View {
 }
 
 struct AppIconView: View {
-    let bundleId: String
+    let app: CiApp
     var forceRefresh: Bool = false
-    @State private var iconURL: URL?
+    @Environment(AuthenticationManager.self) private var authManager
     @State private var didLoad = false
 
     private var demoIconName: String? {
-        DemoData.iconNames[bundleId]
+        DemoData.iconNames[app.attributes.bundleId]
+    }
+
+    private var iconURL: URL? {
+        AppIconCache.shared.cachedIconURL(forBundleID: app.attributes.bundleId)
     }
 
     var body: some View {
@@ -110,7 +114,7 @@ struct AppIconView: View {
         .aspectRatio(1, contentMode: .fit)
         .task(id: forceRefresh) {
             if demoIconName != nil { return }
-            iconURL = await AppIconCache.shared.iconURL(for: bundleId, forceRefresh: forceRefresh)
+            await AppIconCache.shared.loadIcon(for: app, api: authManager.api, forceRefresh: forceRefresh)
             didLoad = true
         }
     }

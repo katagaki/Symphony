@@ -228,7 +228,7 @@ struct AppsListView: View {
                 ForEach(filteredAndSortedApps) { app in
                     NavigationLink(value: app) {
                         VStack(spacing: 8) {
-                            AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
+                            AppIconView(app: app, forceRefresh: forceRefreshIcons)
                                 .frame(width: 60, height: 60)
                                 .overlay(alignment: .bottomTrailing) {
                                     if let latestBuild = manager.latestBuildByApp[app.id] {

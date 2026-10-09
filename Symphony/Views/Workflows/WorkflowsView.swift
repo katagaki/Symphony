@@ -37,7 +37,7 @@ struct WorkflowsView: View {
                     List {
                         Section {
                             VStack(spacing: 8) {
-                                AppIconView(bundleId: app.attributes.bundleId, forceRefresh: forceRefreshIcons)
+                                AppIconView(app: app, forceRefresh: forceRefreshIcons)
                                     .frame(width: 128, height: 128)
                                 VStack(spacing: 4) {
                                     Text(app.attributes.name)
