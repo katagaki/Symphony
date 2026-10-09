@@ -1,0 +1,48 @@
+{
+  "fill": {
+    "automatic-gradient": "srgb:0.47000,0.39000,0.74000,1.00000"
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "image-name": "Oboro-Mist.png",
+          "name": "Oboro-Mist"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    },
+    {
+      "layers": [
+        {
+          "fill": {
+            "automatic-gradient": "srgb:1.00000,0.93000,0.78000,1.00000"
+          },
+          "image-name": "Oboro-Moon.png",
+          "name": "Oboro-Moon"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
+    "squares": "shared"
+  }
+}

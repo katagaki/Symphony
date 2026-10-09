@@ -1,0 +1,39 @@
+{
+  "fill": {
+    "automatic-gradient": "srgb:0.12000,0.17000,0.48000,1.00000"
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "fill": {
+            "automatic-gradient": "srgb:0.86000,0.92000,1.00000,1.00000"
+          },
+          "image-name": "Sirius-Companion.png",
+          "name": "Sirius-Companion"
+        },
+        {
+          "fill": {
+            "automatic-gradient": "srgb:0.93000,0.96000,1.00000,1.00000"
+          },
+          "image-name": "Sirius-Star.png",
+          "name": "Sirius-Star"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
+    "squares": "shared"
+  }
+}

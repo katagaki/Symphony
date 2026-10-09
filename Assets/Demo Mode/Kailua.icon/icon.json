@@ -1,0 +1,59 @@
+{
+  "fill": {
+    "automatic-gradient": "srgb:0.02000,0.71000,0.86000,1.00000"
+  },
+  "groups": [
+    {
+      "blur-material": 0.5,
+      "layers": [
+        {
+          "fill": {
+            "automatic-gradient": "srgb:0.62000,0.93000,0.97000,1.00000"
+          },
+          "image-name": "Kailua-Wave.png",
+          "name": "Kailua-Wave"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    },
+    {
+      "layers": [
+        {
+          "fill": {
+            "automatic-gradient": "srgb:0.62000,0.93000,0.97000,1.00000"
+          },
+          "image-name": "Kailua-Swell.png",
+          "name": "Kailua-Swell"
+        },
+        {
+          "fill": {
+            "automatic-gradient": "srgb:1.00000,0.80000,0.30000,1.00000"
+          },
+          "image-name": "Kailua-Sun.png",
+          "name": "Kailua-Sun"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
+    "squares": "shared"
+  }
+}
