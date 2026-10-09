@@ -84,22 +84,19 @@ actor AppStoreConnectAPI {
     func latestBuildRun(forAppID appID: String) async throws -> CiBuildRun? {
         let product = try await getCiProduct(forAppID: appID)
         let workflows = try await listWorkflows(forProductID: product.id)
-        let latestPerWorkflow = try await withThrowingTaskGroup(of: CiBuildRun?.self) { group in
-            for workflow in workflows {
-                group.addTask {
-                    try await self.listBuildRuns(forWorkflowID: workflow.id, limit: 1).runs.first
-                }
+        // Workflows are fetched one at a time: apps have only a few, and callers already
+        // load several apps in parallel, so a task group nested in theirs buys little.
+        var latest: CiBuildRun?
+        for workflow in workflows {
+            guard let run = try await listBuildRuns(forWorkflowID: workflow.id, limit: 1).runs.first else {
+                continue
             }
-            var runs: [CiBuildRun] = []
-            for try await run in group {
-                if let run { runs.append(run) }
+            // ISO 8601 timestamps in the same format compare correctly as strings.
+            if latest == nil || (run.attributes.createdDate ?? "") > (latest?.attributes.createdDate ?? "") {
+                latest = run
             }
-            return runs
         }
-        // ISO 8601 timestamps in the same format compare correctly as strings.
-        return latestPerWorkflow.max {
-            ($0.attributes.createdDate ?? "") < ($1.attributes.createdDate ?? "")
-        }
+        return latest
     }
 
     func getBuildRun(id: String) async throws -> CiBuildRun {
