@@ -148,6 +148,38 @@ actor AppStoreConnectAPI {
         try await client.delete(path: "/v1/ciBuildRuns/\(id)")
     }
 
+    // MARK: - Builds
+
+    private static let buildFields = URLQueryItem(
+        name: "fields[builds]", value: "uploadedDate,processingState,iconAssetToken"
+    )
+
+    /// The most recently uploaded build of an app that finished processing.
+    func latestProcessedBuild(forAppID appID: String) async throws -> AppBuild? {
+        let response: APIListResponse<AppBuild> = try await client.get(
+            path: "/v1/builds",
+            queryItems: [URLQueryItem(name: "filter[app]", value: appID),
+                         URLQueryItem(name: "filter[processingState]", value: "VALID"),
+                         URLQueryItem(name: "sort", value: "-uploadedDate"),
+                         URLQueryItem(name: "limit", value: "1"),
+                         Self.buildFields]
+        )
+        return response.data.first
+    }
+
+    /// The builds an Xcode Cloud build run uploaded; empty when the run had no archive action.
+    func listBuilds(forBuildRunID buildRunID: String) async throws -> [AppBuild] {
+        let response: APIListResponse<AppBuild> = try await client.get(
+            path: "/v1/ciBuildRuns/\(buildRunID)/builds",
+            queryItems: [Self.buildFields]
+        )
+        return response.data
+    }
+
+    func hasBudgetForBackgroundRequests() async -> Bool {
+        await client.hasBudgetForBackgroundRequests()
+    }
+
     // MARK: - Build Actions
 
     func listBuildActions(forBuildRunID buildRunID: String) async throws -> [CiBuildAction] {
