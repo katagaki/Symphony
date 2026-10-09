@@ -194,7 +194,7 @@ final class AppIconCache {
         return Date().timeIntervalSince(checked) >= interval
     }
 
-    private static func parseDate(_ string: String) -> Date? {
+    private nonisolated static func parseDate(_ string: String) -> Date? {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         if let date = formatter.date(from: string) { return date }
