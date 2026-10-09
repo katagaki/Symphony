@@ -9,6 +9,11 @@ actor APIClient {
     private let keyID: String
     private let privateKey: String
 
+    // Hourly quota reported by the X-Rate-Limit header on every response.
+    private var rateLimitPerHour: Int?
+    private var rateLimitRemaining: Int?
+    private var rateLimitedUntil: Date?
+
     init(credentials: Credentials) {
         self.issuerID = credentials.issuerID
         self.keyID = credentials.keyID
@@ -67,6 +72,7 @@ actor APIClient {
         guard let http = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
         }
+        recordRateLimit(http)
         // 204 No Content is the expected success response for DELETE
         if !(200...299).contains(http.statusCode) {
             try validateResponse(response, data: data)
@@ -92,6 +98,38 @@ actor APIClient {
         return try decodeResponse(data)
     }
 
+    /// Whether there is enough hourly quota left for non-essential requests such as
+    /// icon refreshes. Keeps a reserve so they never starve user-initiated requests.
+    func hasBudgetForBackgroundRequests() -> Bool {
+        if let rateLimitedUntil, Date() < rateLimitedUntil {
+            return false
+        }
+        guard let remaining = rateLimitRemaining else { return true }
+        let reserve = max(100, (rateLimitPerHour ?? 0) / 5)
+        return remaining > reserve
+    }
+
+    /// Parses `X-Rate-Limit: user-hour-lim:3600;user-hour-rem:3545;`.
+    private func recordRateLimit(_ http: HTTPURLResponse) {
+        if http.statusCode == 429 {
+            let retryAfter = http.value(forHTTPHeaderField: "Retry-After").flatMap(TimeInterval.init) ?? 300
+            rateLimitedUntil = Date().addingTimeInterval(retryAfter)
+            rateLimitRemaining = 0
+        }
+        guard let header = http.value(forHTTPHeaderField: "X-Rate-Limit") else { return }
+        for pair in header.split(separator: ";") {
+            let parts = pair.split(separator: ":", maxSplits: 1)
+            guard parts.count == 2, let value = Int(parts[1].trimmingCharacters(in: .whitespaces)) else {
+                continue
+            }
+            switch parts[0].trimmingCharacters(in: .whitespaces) {
+            case "user-hour-lim": rateLimitPerHour = value
+            case "user-hour-rem": rateLimitRemaining = value
+            default: break
+            }
+        }
+    }
+
     private func decodeResponse<T: Decodable>(_ data: Data) throws -> T {
         let decoder = JSONDecoder()
         do {
@@ -105,6 +143,7 @@ actor APIClient {
         guard let http = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
         }
+        recordRateLimit(http)
         switch http.statusCode {
         case 200...299:
             return
