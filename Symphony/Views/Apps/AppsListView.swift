@@ -140,15 +140,6 @@ struct AppsListView: View {
                     }
                     .pickerStyle(.inline)
                     Divider()
-                    Button {
-                        if authManager.isDemoMode {
-                            showDemoAccountsAlert = true
-                        } else {
-                            showAccounts = true
-                        }
-                    } label: {
-                        Label("Accounts.Title", systemImage: "person.crop.circle")
-                    }
                     if !authManager.isDemoMode {
                         Button {
                             showTeamID = true
@@ -175,6 +166,9 @@ struct AppsListView: View {
                     Image(systemName: "ellipsis")
                 }
             }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                accountMenu
+            }
         }
         .sheet(isPresented: $showAccounts) {
             AccountsView()
@@ -197,6 +191,37 @@ struct AppsListView: View {
             }
             appsManager = manager
             await manager.loadApps()
+        }
+    }
+
+    private var accountMenu: some View {
+        Menu {
+            if !authManager.isDemoMode {
+                Section {
+                    ForEach(authManager.accounts) { account in
+                        Button {
+                            authManager.selectAccount(account)
+                        } label: {
+                            if account.id == authManager.selectedAccount?.id {
+                                Label(account.name, systemImage: "checkmark")
+                            } else {
+                                Text(account.name)
+                            }
+                        }
+                    }
+                }
+            }
+            Section {
+                Button("Accounts.Manage") {
+                    if authManager.isDemoMode {
+                        showDemoAccountsAlert = true
+                    } else {
+                        showAccounts = true
+                    }
+                }
+            }
+        } label: {
+            Image(systemName: "person.crop.circle")
         }
     }
 
