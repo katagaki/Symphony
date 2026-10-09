@@ -92,33 +92,42 @@ func archivo(ofSize size: CGFloat, bold: Bool) -> NSFont {
 
 /// One line of text at the largest size up to `size` that fits `maxWidth`.
 struct Line {
-    let text: String
-    let attributes: [NSAttributedString.Key: Any]
+    let text: NSAttributedString
     let size: NSSize
+    /// The glyphs' bounds, relative to the start of the baseline.
+    let ink: NSRect
 
     init(_ text: String, size: CGFloat, bold: Bool, maxWidth: CGFloat) {
         var fontSize = size
-        var attributes: [NSAttributedString.Key: Any] = [:]
+        var attributed = NSAttributedString(string: text)
         var lineSize = NSSize.zero
         while fontSize > 10 {
-            attributes = [
+            attributed = NSAttributedString(string: text, attributes: [
                 .font: archivo(ofSize: fontSize, bold: bold),
                 .foregroundColor: textColor,
                 // Slightly tight, like the designs.
                 .kern: -fontSize * 0.02,
-            ]
-            lineSize = (text as NSString).size(withAttributes: attributes)
+            ])
+            lineSize = attributed.size()
             if lineSize.width <= maxWidth { break }
             fontSize -= 2
         }
-        self.text = text
-        self.attributes = attributes
+        self.text = attributed
         self.size = lineSize
+        // Centering by the line box leaves the text looking off, since it carries space
+        // above the capitals and below the baseline, so the glyphs are measured instead.
+        ink = attributed.boundingRect(
+            with: NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude),
+            options: .usesDeviceMetrics
+        )
     }
 
-    /// Draws the line from `x`, with the top of its line box at `top`.
-    func draw(x: CGFloat, top: CGFloat) {
-        (text as NSString).draw(at: NSPoint(x: x, y: top - size.height), withAttributes: attributes)
+    /// Draws the line with its glyphs centered on `centerX` and its baseline at `baseline`.
+    func draw(centerX: CGFloat, baseline: CGFloat) {
+        text.draw(
+            with: NSRect(x: centerX - ink.midX, y: baseline, width: size.width * 2, height: size.height),
+            options: []
+        )
     }
 }
 
@@ -178,23 +187,22 @@ func compose(_ shot: Screenshot, language: String, device: Device) -> Bool {
     NSGradient(starting: gradientTop, ending: gradientBottom)?
         .draw(in: NSRect(origin: .zero, size: canvasSize), angle: -90)
 
-    // Two left-aligned lines in a band at the top. AppKit's origin is bottom-left.
+    // Two centered lines in a band at the top. AppKit's origin is bottom-left.
     let margin = 96 * s
     let textWidth = canvasSize.width - 2 * margin
     // Scaled up less than the rest on iPad, so the device keeps its room.
     let textSize = 104 * min(s, 1.25)
     let header = Line(copy.header, size: textSize, bold: true, maxWidth: textWidth)
     let caption = Line(copy.caption, size: textSize, bold: false, maxWidth: textWidth)
-    let headerTop = canvasSize.height - 150 * s
-    header.draw(x: margin, top: headerTop)
-    let captionTop = headerTop - header.size.height
-    caption.draw(x: margin, top: captionTop)
+    let baselineGap = header.size.height
+    // From the top of the header's glyphs to the bottom of the caption's.
+    let inkHeight = header.ink.maxY + baselineGap - caption.ink.minY
 
-    // The whole device sits below the text, centered in the space that is left.
+    // The whole device sits below the text band, centered in the space that is left.
     let screenAspect = CGFloat(rawRep.pixelsWide) / CGFloat(rawRep.pixelsHigh)
     let screenHeightPerWidth = (1 - 2 * device.bezel) / screenAspect
     let aspect = 1 / (screenHeightPerWidth + 2 * device.bezel)
-    let deviceTop = captionTop - caption.size.height - 96 * s
+    let deviceTop = canvasSize.height - inkHeight - 2 * 120 * s
     let availableHeight = deviceTop - 120 * s
     var deviceSize = NSSize(width: availableHeight * aspect, height: availableHeight)
     if deviceSize.width > canvasSize.width - 2 * margin {
@@ -207,6 +215,13 @@ func compose(_ shot: Screenshot, language: String, device: Device) -> Bool {
         width: deviceSize.width,
         height: deviceSize.height
     )
+
+    // The text's glyphs are centered between the top of the canvas and the device.
+    let inkTop = (canvasSize.height + deviceRect.maxY + inkHeight) / 2
+    let headerBaseline = (inkTop - header.ink.maxY).rounded()
+    header.draw(centerX: canvasSize.width / 2, baseline: headerBaseline)
+    caption.draw(centerX: canvasSize.width / 2, baseline: headerBaseline - baselineGap)
+
     drawDevice(device, raw: raw, in: deviceRect)
 
     image.unlockFocus()
