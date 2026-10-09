@@ -27,6 +27,13 @@ final class WorkflowCache {
         entries[appID]
     }
 
+    /// Every cached workflow, paired with the ID of the app it belongs to.
+    func allWorkflows() -> [(appID: String, workflow: CiWorkflow)] {
+        entries.flatMap { appID, cached in
+            cached.workflows.map { (appID, $0) }
+        }
+    }
+
     func save(_ cached: CachedAppWorkflows, forAppID appID: String) {
         entries[appID] = cached
         saveToDisk()
