@@ -18,6 +18,7 @@ final class AuthenticationManager {
 
     init() {
         loadFromKeychain()
+        isDemoMode = ScreenshotScreen.current != nil
     }
 
     var isAuthenticated: Bool {

@@ -10,10 +10,11 @@ import SwiftUI
 struct ContentView: View {
     @Environment(AuthenticationManager.self) private var authManager
     @Namespace private var namespace
+    @State private var path = ScreenshotScreen.current?.path ?? NavigationPath()
 
     var body: some View {
         if authManager.isAuthenticated {
-            NavigationStack {
+            NavigationStack(path: $path) {
                 AppsListView(namespace: namespace)
                     .navigationDestination(for: CiApp.self) { app in
                         WorkflowsView(app: app)
