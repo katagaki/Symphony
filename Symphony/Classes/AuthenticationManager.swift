@@ -123,6 +123,7 @@ final class AuthenticationManager {
         // Drop workflow data cached for this account's apps before forgetting the app list.
         if let cachedApps = AppListCache.shared.load(forAccountID: accountKey)?.apps {
             WorkflowCache.shared.remove(forAppIDs: cachedApps.map(\.id))
+            LatestBuildCache.shared.remove(forAppIDs: cachedApps.map(\.id))
         }
         AppListCache.shared.remove(forAccountID: accountKey)
         persist()
@@ -144,6 +145,7 @@ final class AuthenticationManager {
         KeychainService.deleteAll()
         AppListCache.shared.clearAll()
         WorkflowCache.shared.clearAll()
+        LatestBuildCache.shared.clearAll()
         accounts = []
         selectedAccountID = nil
         api = nil

@@ -4,6 +4,8 @@ import Observation
 @Observable
 final class AppsManager {
     var apps: [CiApp] = []
+    /// Latest build run per app ID, for apps that have at least one build.
+    var latestBuildByApp: [String: CiBuildRun] = [:]
     var isLoading: Bool = false
     var isRefreshing: Bool = false
     var error: String?
@@ -32,6 +34,9 @@ final class AppsManager {
         error = nil
         if isDemoMode {
             apps = DemoData.apps
+            latestBuildByApp = DemoData.apps.reduce(into: [:]) { result, app in
+                result[app.id] = DemoData.latestBuildRun(forAppID: app.id)
+            }
             return
         }
         guard let api else { return }
@@ -57,6 +62,51 @@ final class AppsManager {
         }
         isLoading = false
         isRefreshing = false
+
+        await loadLatestBuilds()
+    }
+
+    /// Fetches the latest build run for every app, a few apps at a time to stay
+    /// within API rate limits. Apps whose fetch fails keep their cached status.
+    func loadLatestBuilds() async {
+        guard let api, !apps.isEmpty else { return }
+        let appIDs = apps.map(\.id)
+        var latest = latestBuildByApp
+        var checkedAppIDs: [String] = []
+        let maxConcurrent = 4
+
+        await withTaskGroup(of: (String, Result<CiBuildRun?, Error>).self) { group in
+            var pending = appIDs.makeIterator()
+            func addNext() {
+                guard let appID = pending.next() else { return }
+                group.addTask {
+                    do {
+                        return (appID, .success(try await api.latestBuildRun(forAppID: appID)))
+                    } catch {
+                        return (appID, .failure(error))
+                    }
+                }
+            }
+            for _ in 0..<maxConcurrent { addNext() }
+            for await (appID, result) in group {
+                switch result {
+                case .success(let run):
+                    latest[appID] = run
+                    checkedAppIDs.append(appID)
+                case .failure(APIError.notFound):
+                    // No Xcode Cloud product for this app.
+                    latest[appID] = nil
+                    checkedAppIDs.append(appID)
+                case .failure:
+                    break
+                }
+                latestBuildByApp = latest
+                addNext()
+            }
+        }
+
+        latestBuildByApp = latest.filter { appIDs.contains($0.key) }
+        LatestBuildCache.shared.save(latestBuildByApp, forAppIDs: checkedAppIDs)
     }
 
     // MARK: - Cache
@@ -71,6 +121,7 @@ final class AppsManager {
         }
         apps = cached.apps
         lastUpdated = cached.fetchedAt
+        latestBuildByApp = LatestBuildCache.shared.load(forAppIDs: cached.apps.map(\.id))
         return true
     }
 

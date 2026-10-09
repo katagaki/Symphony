@@ -79,6 +79,12 @@ enum DemoData {
         }
     }
 
+    static func latestBuildRun(forAppID appID: String) -> CiBuildRun? {
+        workflows(forAppID: appID)
+            .flatMap { buildRuns(forWorkflowID: $0.id) }
+            .max { ($0.attributes.createdDate ?? "") < ($1.attributes.createdDate ?? "") }
+    }
+
     static func branchNames(forWorkflowID workflowID: String) -> [String: String] {
         var result: [String: String] = [:]
         for build in buildRuns(forWorkflowID: workflowID) {

@@ -78,6 +78,30 @@ actor AppStoreConnectAPI {
         return (response.data, branchNames)
     }
 
+    /// The most recently created build run across all of an app's workflows.
+    /// Returns nil when the app has Xcode Cloud set up but no builds yet; throws
+    /// `APIError.notFound` when the app has no Xcode Cloud product.
+    func latestBuildRun(forAppID appID: String) async throws -> CiBuildRun? {
+        let product = try await getCiProduct(forAppID: appID)
+        let workflows = try await listWorkflows(forProductID: product.id)
+        let latestPerWorkflow = try await withThrowingTaskGroup(of: CiBuildRun?.self) { group in
+            for workflow in workflows {
+                group.addTask {
+                    try await self.listBuildRuns(forWorkflowID: workflow.id, limit: 1).runs.first
+                }
+            }
+            var runs: [CiBuildRun] = []
+            for try await run in group {
+                if let run { runs.append(run) }
+            }
+            return runs
+        }
+        // ISO 8601 timestamps in the same format compare correctly as strings.
+        return latestPerWorkflow.max {
+            ($0.attributes.createdDate ?? "") < ($1.attributes.createdDate ?? "")
+        }
+    }
+
     func getBuildRun(id: String) async throws -> CiBuildRun {
         let response: APIResponse<CiBuildRun> = try await client.get(
             path: "/v1/ciBuildRuns/\(id)"
