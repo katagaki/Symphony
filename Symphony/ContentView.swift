@@ -13,7 +13,7 @@ struct ContentView: View {
     @Namespace private var namespace
     @State private var path = ScreenshotScreen.current?.path ?? NavigationPath()
     @State private var selectedApp: CiApp? = ScreenshotScreen.current?.app
-    @State private var detailPath = NavigationPath()
+    @State private var detailPath = ScreenshotScreen.current?.detailPath ?? NavigationPath()
 
     var body: some View {
         if authManager.isAuthenticated {
