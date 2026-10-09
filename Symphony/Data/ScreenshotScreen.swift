@@ -14,10 +14,16 @@ enum ScreenshotScreen: String {
         #endif
     }
 
+    /// The app the screen opens on, if any.
+    var app: CiApp? {
+        guard self == .builds else { return nil }
+        return DemoData.apps.first(where: { $0.id == "demo-app-sirius" })
+    }
+
     /// The navigation path the screen opens on.
     var path: NavigationPath {
         var path = NavigationPath()
-        if self == .builds, let app = DemoData.apps.first(where: { $0.id == "demo-app-sirius" }) {
+        if let app {
             path.append(app)
         }
         return path

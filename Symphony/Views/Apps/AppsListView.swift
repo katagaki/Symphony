@@ -33,6 +33,8 @@ enum AppsViewMode: String, CaseIterable {
 
 struct AppsListView: View {
     let namespace: Namespace.ID
+    /// The app shown in the detail column, when the apps are a split view sidebar.
+    var selection: Binding<CiApp?>?
     @Environment(AuthenticationManager.self) private var authManager
     @State private var appsManager: AppsManager?
     @State private var sortOrder: AppSortOrder = .name
@@ -226,7 +228,7 @@ struct AppsListView: View {
     }
 
     private func appsList(manager: AppsManager) -> some View {
-        List(filteredAndSortedApps) { app in
+        List(filteredAndSortedApps, selection: selection) { app in
             NavigationLink(value: app) {
                 AppRowView(
                     app: app,
@@ -251,7 +253,7 @@ struct AppsListView: View {
                 spacing: 16
             ) {
                 ForEach(filteredAndSortedApps) { app in
-                    NavigationLink(value: app) {
+                    gridLink(app: app) {
                         VStack(spacing: 8) {
                             AppIconView(app: app, forceRefresh: forceRefreshIcons)
                                 .frame(width: 60, height: 60)
@@ -268,6 +270,13 @@ struct AppsListView: View {
                                 .foregroundStyle(.primary)
                         }
                         .frame(maxWidth: .infinity)
+                        .padding(.vertical, selection == nil ? 0 : 8)
+                        .background {
+                            if selection?.wrappedValue == app {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(.tint.opacity(0.2))
+                            }
+                        }
                         .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
@@ -280,6 +289,19 @@ struct AppsListView: View {
             forceRefreshIcons = true
             await manager.loadApps()
             forceRefreshIcons = false
+        }
+    }
+
+    @ViewBuilder
+    private func gridLink<Label: View>(app: CiApp, @ViewBuilder label: () -> Label) -> some View {
+        if let selection {
+            Button {
+                selection.wrappedValue = app
+            } label: {
+                label()
+            }
+        } else {
+            NavigationLink(value: app, label: label)
         }
     }
 }
