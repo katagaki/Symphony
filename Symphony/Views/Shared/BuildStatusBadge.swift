@@ -3,15 +3,14 @@ import SwiftUI
 struct BuildStatusBadge: View {
     let progress: ExecutionProgress?
     let status: CompletionStatus?
+    @ScaledMetric(relativeTo: .subheadline) private var iconSize: CGFloat = 18
 
     var body: some View {
         Label {
             Text(labelText)
                 .foregroundStyle(.secondary)
         } icon: {
-            Image(systemName: iconName)
-                .foregroundStyle(iconColor)
-                .symbolRenderingMode(.hierarchical)
+            BuildStatusSymbol(progress: progress, status: status, size: iconSize)
         }
         .labelIconToTitleSpacing(4)
         .font(.subheadline)
@@ -39,18 +38,18 @@ struct BuildStatusBadge: View {
     var iconName: String {
         if let progress, progress != .complete {
             switch progress {
-            case .pending: return "clock.fill"
+            case .pending: return "clock"
             case .running: return "arrow.triangle.2.circlepath"
-            case .complete: return "checkmark.circle.fill"
+            case .complete: return "checkmark"
             }
         }
 
-        guard let status else { return "questionmark.circle.fill" }
+        guard let status else { return "questionmark" }
         switch status {
-        case .succeeded: return "checkmark.circle.fill"
-        case .failed: return "xmark.circle.fill"
-        case .errored: return "exclamationmark.triangle.fill"
-        case .canceled: return "minus.circle.fill"
+        case .succeeded: return "checkmark"
+        case .failed: return "xmark"
+        case .errored: return "exclamationmark"
+        case .canceled: return "minus"
         case .skipped: return "forward.fill"
         }
     }
@@ -64,13 +63,13 @@ struct BuildStatusBadge: View {
             }
         }
 
-        guard let status else { return .secondary }
+        guard let status else { return .gray }
         switch status {
         case .succeeded: return .green
         case .failed: return .red
         case .errored: return .red
-        case .canceled: return .secondary
-        case .skipped: return .secondary
+        case .canceled: return .gray
+        case .skipped: return .gray
         }
     }
 }
@@ -78,12 +77,29 @@ struct BuildStatusBadge: View {
 struct BuildStatusIcon: View {
     let progress: ExecutionProgress?
     let status: CompletionStatus?
+    @ScaledMetric(relativeTo: .title) private var iconSize: CGFloat = 30
+
+    var body: some View {
+        BuildStatusSymbol(progress: progress, status: status, size: iconSize)
+    }
+}
+
+/// A filled circle in the status color with the status glyph drawn in white.
+struct BuildStatusSymbol: View {
+    let progress: ExecutionProgress?
+    let status: CompletionStatus?
+    let size: CGFloat
 
     var body: some View {
         let badge = BuildStatusBadge(progress: progress, status: status)
-        Image(systemName: badge.iconName)
-            .symbolRenderingMode(.hierarchical)
-            .foregroundStyle(badge.iconColor)
-            .font(.title)
+        Circle()
+            .fill(badge.iconColor)
+            .frame(width: size, height: size)
+            .overlay {
+                Image(systemName: badge.iconName)
+                    .font(.system(size: size * 0.5, weight: .bold))
+                    .foregroundStyle(.white)
+            }
+            .accessibilityHidden(true)
     }
 }

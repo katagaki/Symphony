@@ -28,10 +28,11 @@ struct BuildRunDetailView: View {
                                 progress: currentBuildRun?.attributes.executionProgress,
                                 status: currentBuildRun?.attributes.completionStatus
                             )
-                            Image(systemName: badge.iconName)
-                                .font(.system(size: 56))
-                                .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(badge.iconColor)
+                            BuildStatusSymbol(
+                                progress: currentBuildRun?.attributes.executionProgress,
+                                status: currentBuildRun?.attributes.completionStatus,
+                                size: 56
+                            )
                             Text(badge.labelText)
                                 .font(.headline)
                                 .foregroundStyle(.secondary)
