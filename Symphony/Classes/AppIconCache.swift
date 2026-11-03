@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-/// Caches app icon URLs. Icons come from the app's latest uploaded build, falling back to
-/// the iTunes lookup API for apps that have never had a build icon. Build lookups count
+/// Caches app icon URLs. Icons come from the app's latest uploaded build, preferring iOS
+/// builds for multiplatform apps, falling back to the iTunes lookup API for apps that have never had a build icon. Build lookups count
 /// toward the App Store Connect hourly quota, so they are rate limited and skipped
 /// entirely when the quota runs low.
 @Observable
@@ -24,6 +24,9 @@ final class AppIconCache {
         var buildsCheckedAt: Date?
         /// Finish date of the newest successful build run whose builds have been checked.
         var handledRunFinishedAt: Date?
+        /// Whether a build icon came from an iOS build; nil for build icons cached before
+        /// platforms were tracked, which are rechecked so an iOS icon can replace them.
+        var iconIsIOS: Bool?
     }
 
     private var entries: [String: CacheEntry] = [:]
@@ -123,10 +126,14 @@ final class AppIconCache {
                 let build = try await api.latestProcessedBuild(forAppID: app.id)
                 var entry = entries[key] ?? CacheEntry(urlString: nil, fetchedAt: .distantPast)
                 entry.buildsCheckedAt = .now
-                if let url = build?.attributes.iconAssetToken?.url(size: iconSize) {
+                if let build, let url = build.attributes.iconAssetToken?.url(size: iconSize) {
                     entry.urlString = url.absoluteString
                     entry.fetchedAt = .now
                     entry.source = .build
+                    entry.iconIsIOS = build.platform == .iOS
+                } else if entry.source == .build, entry.iconIsIOS == nil {
+                    // Keep the legacy icon, but don't recheck it again before its TTL.
+                    entry.iconIsIOS = false
                 }
                 entries[key] = entry
                 saveToDisk()
@@ -162,12 +169,30 @@ final class AppIconCache {
         guard let builds = try? await api.listBuilds(forBuildRunID: run.id),
               var entry = entries[key] else { return }
 
-        if let url = builds.lazy.compactMap({ $0.attributes.iconAssetToken?.url(size: self.iconSize) }).first {
-            entry.urlString = url.absoluteString
+        let icons = builds.compactMap { build -> (url: URL, isIOS: Bool)? in
+            build.attributes.iconAssetToken?.url(size: self.iconSize).map { ($0, build.platform == .iOS) }
+        }
+        let withinGracePeriod = Date() <= finishedAt.addingTimeInterval(processingGracePeriod)
+        let hasIOSIcon = entry.source == .build && entry.iconIsIOS == true
+
+        if let icon = icons.first(where: \.isIOS) {
+            entry.urlString = icon.url.absoluteString
             entry.fetchedAt = .now
             entry.source = .build
+            entry.iconIsIOS = true
             entry.handledRunFinishedAt = finishedAt
-        } else if builds.isEmpty || Date() > finishedAt.addingTimeInterval(processingGracePeriod) {
+        } else if withinGracePeriod, builds.contains(where: { $0.platform == .iOS }) {
+            // The run's iOS build is still processing; wait for its icon rather than another platform's.
+            return
+        } else if let icon = icons.first, !hasIOSIcon {
+            entry.urlString = icon.url.absoluteString
+            entry.fetchedAt = .now
+            entry.source = .build
+            entry.iconIsIOS = false
+            entry.handledRunFinishedAt = finishedAt
+        } else if builds.isEmpty || !icons.isEmpty || !withinGracePeriod {
+            // Nothing was uploaded (e.g. a test-only workflow), only other platforms' icons arrived
+            // while an iOS icon is already shown, or processing never produced an icon.
             // Nothing was uploaded (e.g. a test-only workflow), or processing never produced an icon.
             entry.handledRunFinishedAt = finishedAt
         } else {
@@ -186,6 +211,8 @@ final class AppIconCache {
     private func needsBuildCheck(_ key: String, forceRefresh: Bool) -> Bool {
         guard canAttemptBuildFetch(key) else { return false }
         guard let entry = entries[key], let checked = entry.buildsCheckedAt else { return true }
+        // Build icons cached before platforms were tracked may not be the iOS icon.
+        if entry.source == .build, entry.iconIsIOS == nil { return true }
         let interval: TimeInterval
         if forceRefresh {
             interval = forcedBuildRecheckInterval
