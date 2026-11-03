@@ -147,30 +147,51 @@ actor AppStoreConnectAPI {
 
     // MARK: - Builds
 
-    private static let buildFields = URLQueryItem(
-        name: "fields[builds]", value: "uploadedDate,processingState,iconAssetToken"
-    )
+    private static let buildQueryItems = [
+        URLQueryItem(name: "fields[builds]",
+                     value: "uploadedDate,processingState,iconAssetToken,preReleaseVersion"),
+        URLQueryItem(name: "include", value: "preReleaseVersion"),
+        URLQueryItem(name: "fields[preReleaseVersions]", value: "platform")
+    ]
 
-    /// The most recently uploaded build of an app that finished processing.
+    /// The most recently uploaded processed build of an app, preferring iOS builds so that
+    /// multiplatform apps show their iOS icon. Falls back to the newest build of any platform.
     func latestProcessedBuild(forAppID appID: String) async throws -> AppBuild? {
-        let response: APIListResponse<AppBuild> = try await client.get(
+        let response: APIListResponseWithIncludes<AppBuild, PreReleaseVersion> = try await client.get(
             path: "/v1/builds",
             queryItems: [URLQueryItem(name: "filter[app]", value: appID),
                          URLQueryItem(name: "filter[processingState]", value: "VALID"),
                          URLQueryItem(name: "sort", value: "-uploadedDate"),
-                         URLQueryItem(name: "limit", value: "1"),
-                         Self.buildFields]
+                         URLQueryItem(name: "limit", value: "20")] + Self.buildQueryItems
         )
-        return response.data.first
+        let builds = Self.resolvingPlatforms(response)
+        return builds.first { $0.platform == .iOS } ?? builds.first
     }
 
     /// The builds an Xcode Cloud build run uploaded; empty when the run had no archive action.
     func listBuilds(forBuildRunID buildRunID: String) async throws -> [AppBuild] {
-        let response: APIListResponse<AppBuild> = try await client.get(
+        let response: APIListResponseWithIncludes<AppBuild, PreReleaseVersion> = try await client.get(
             path: "/v1/ciBuildRuns/\(buildRunID)/builds",
-            queryItems: [Self.buildFields]
+            queryItems: Self.buildQueryItems
         )
-        return response.data
+        return Self.resolvingPlatforms(response)
+    }
+
+    private static func resolvingPlatforms(
+        _ response: APIListResponseWithIncludes<AppBuild, PreReleaseVersion>
+    ) -> [AppBuild] {
+        let platformsByID = Dictionary(
+            response.included.map { ($0.id, $0.attributes.platform) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        return response.data.map { build in
+            var build = build
+            if let versionID = build.relationships?.preReleaseVersion?.data?.id,
+               let platform = platformsByID[versionID] ?? nil {
+                build.platform = AppBuild.Platform(rawValue: platform)
+            }
+            return build
+        }
     }
 
     func hasBudgetForBackgroundRequests() async -> Bool {
